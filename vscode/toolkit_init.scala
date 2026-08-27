@@ -3,10 +3,24 @@
 
 @main def vsInit(args: String*): Unit = {
     val toolkitDir = findToolkitDir(os.pwd) 
-    //pass current working directory to find the toolkit folder
-    println(os.pwd)
-    println(toolkitDir)
+    //pass execution directory to find the toolkit folder
+    //Note: only work only if this method is called within toolkit folder
 
+    val scriptDir = toolkitDir / "script"
+
+    //Checking if the "script" exist and a folder
+    if (!(os.exists(scriptDir) && os.isDir(scriptDir))) {
+        println("ERROR: No script folder found")
+        sys.exit(1)
+    }
+
+    // Filter scala files and then remove .scala extension
+    val scriptFiles = os.list(scriptDir)
+    .filter(_.ext == "scala")
+    .map(_.last.stripSuffix(".scala"))
+    .toList
+
+    println(scriptFiles)
 }
 
 def findToolkitDir(currentDir: os.Path): os.Path = {
