@@ -15,12 +15,12 @@
     }
 
     // Filter scala files and then remove .scala extension
-    val scriptFiles = os.list(scriptDir)
-    .filter(_.ext == "scala")
-    .map(_.last.stripSuffix(".scala"))
-    .toList
+    // val scriptFiles = os.list(scriptDir)
+    // .filter(_.ext == "scala")
+    // .map(_.last.stripSuffix(".scala"))
+    // .toList
 
-    println(scriptFiles)
+    // println(s"Discovered Scripts: ${scriptFiles.mkString(", ")}")
 }
 
 def findToolkitDir(currentDir: os.Path): os.Path = {

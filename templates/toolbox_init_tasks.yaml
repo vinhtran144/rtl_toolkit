@@ -1,0 +1,22 @@
+version: "2.0.0"
+tasks:
+  - label: "Toolkit: execute script"
+    type: "shell"
+    command: "scala run ${env:TOOLKIT_PATH}/scripts/${input:scriptName}.scala"
+    options:
+      env:
+        TOOLKIT_PATH: ""  # Will be hardcoded into the task, hence it's important to gitignore
+    group:
+      kind: "build"
+      isDefault: false
+    problemMatcher: []
+    presentation:
+      echo: true
+      reveal: "always"
+      panel: "shared"
+
+inputs:
+  - id: "scriptName"
+    type: "promptString"
+    description: "Input script name:"
+    default: "main"
