@@ -1,5 +1,12 @@
 //> using scala 3.8.4
 //> using dep com.lihaoyi::os-lib:0.11.8
+//> using dep io.circe::circe-core:0.14.9
+//> using dep io.circe::circe-parser:0.14.9
+//> using dep io.circe::circe-yaml:0.15.1
+
+import io.circe._
+import io.circe.yaml.parser
+import io.circe.parser.{parse => parseJson}
 
 @main def vsInit(args: String*): Unit = {
     val toolkitDir = findToolkitDir(os.pwd) 
@@ -21,6 +28,19 @@
     // .toList
 
     // println(s"Discovered Scripts: ${scriptFiles.mkString(", ")}")
+
+    // Read task template
+    val taskTempDir = toolkitDir / "templates" / "toolbox_init_tasks.yaml"
+    val rawYamlStr   = os.read(taskTempDir)
+
+    val templateJson: Json = parser.parse(rawYamlStr) match {
+      case Right(json) => json
+      case Left(err)   => 
+        println(s"[!] Failed to parse YAML: ${err.getMessage}")
+        sys.exit(1)
+    }
+
+    println(templateJson)
 }
 
 def findToolkitDir(currentDir: os.Path): os.Path = {
