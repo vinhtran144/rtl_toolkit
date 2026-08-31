@@ -2,7 +2,7 @@ version: "2.0.0"
 tasks:
   - label: "Toolkit: execute script"
     type: "shell"
-    command: "scala run ${env:TOOLKIT_PATH}/scripts/${input:scriptName}.scala"
+    command: "scala run $env:TOOLKIT_PATH/script/${input:scriptName}.scala"
     options:
       env:
         TOOLKIT_PATH: ""  # Will be hardcoded into the task, hence it's important to gitignore

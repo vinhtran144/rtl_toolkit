@@ -40,7 +40,27 @@ import io.circe.parser.{parse => parseJson}
         sys.exit(1)
     }
 
-    println(templateJson)
+    // Inject toolkit local directory into task template
+    val envObj = Json.obj("TOOLKIT_PATH" -> Json.fromString(toolkitDir.toString))
+
+
+    val taskJson = templateJson.hcursor
+        .downField("tasks")
+        .downArray                      // Assume the's only 1 task requiring toolkit path
+        .downField("options")
+        .downField("env")
+        .withFocus(_.deepMerge(envObj))
+        .top
+        .getOrElse(templateJson)
+
+    println(taskJson)
+
+    //VSCode Tasks folder
+    val tasksJsonFile = toolkitDir / ".vscode" / "tasks.json"
+
+    // Write tasks.json into toolkit .vscode folder
+    val formattedJsonStr = Printer.spaces2.copy(dropNullValues = true).print(taskJson)
+    os.write.over(tasksJsonFile, formattedJsonStr, createFolders = true)
 }
 
 def findToolkitDir(currentDir: os.Path): os.Path = {
