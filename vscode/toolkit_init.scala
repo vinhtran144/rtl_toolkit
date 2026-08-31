@@ -13,11 +13,11 @@ import io.circe.parser.{parse => parseJson}
     //pass execution directory to find the toolkit folder
     //Note: only work only if this method is called within toolkit folder
 
-    val scriptDir = toolkitDir / "script"
+    val scriptDir = toolkitDir / "scripts"
 
     //Checking if the "script" exist and a folder
     if (!(os.exists(scriptDir) && os.isDir(scriptDir))) {
-        println("ERROR: No script folder found")
+        println("ERROR: No scripts folder found")
         sys.exit(1)
     }
 
@@ -33,27 +33,12 @@ import io.circe.parser.{parse => parseJson}
     val taskTempDir = toolkitDir / "templates" / "toolbox_init_tasks.yaml"
     val rawYamlStr   = os.read(taskTempDir)
 
-    val templateJson: Json = parser.parse(rawYamlStr) match {
+    val taskJson: Json = parser.parse(rawYamlStr) match {
       case Right(json) => json
       case Left(err)   => 
         println(s"[!] Failed to parse YAML: ${err.getMessage}")
         sys.exit(1)
     }
-
-    // Inject toolkit local directory into task template
-    val envObj = Json.obj("TOOLKIT_PATH" -> Json.fromString(toolkitDir.toString))
-
-
-    val taskJson = templateJson.hcursor
-        .downField("tasks")
-        .downArray                      // Assume the's only 1 task requiring toolkit path
-        .downField("options")
-        .downField("env")
-        .withFocus(_.deepMerge(envObj))
-        .top
-        .getOrElse(templateJson)
-
-    println(taskJson)
 
     //VSCode Tasks folder
     val tasksJsonFile = toolkitDir / ".vscode" / "tasks.json"

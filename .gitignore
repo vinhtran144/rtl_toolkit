@@ -8,8 +8,6 @@
 .scala-build/
 
 # VSCode
-# NOTE: This toolkit will hardcode tasks with local directory, like a local installation
-#       Therefore, do NOT include tasks.json into git
 .vscode/  
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml

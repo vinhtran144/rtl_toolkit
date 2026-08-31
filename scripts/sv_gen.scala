@@ -3,6 +3,7 @@
 
 
 @main def sv_gen(args: String*): Unit = {
+    val targetPathStr = if (args.nonEmpty) args(0) else "."
     println("Hello World")
-    println(os.pwd)
+    println(s"Executed from $targetPathStr")
 }
