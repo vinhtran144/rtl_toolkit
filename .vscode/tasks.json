@@ -1,0 +1,47 @@
+{
+  "version" : "2.0.0",
+  "tasks" : [
+    {
+      "label": "Utils: Update Toolkit",
+      "type": "shell",
+      "command": "scala run ${workspaceFolder}/utils/update_toolkit.scala",
+      "problemMatcher": [],
+      "group" : {
+        "kind" : "build",
+        "isDefault" : false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false
+      }
+    },
+    {
+      "label" : "Toolkit: Execute scripts",
+      "type" : "shell",
+      "command" : "scala run ${workspaceFolder}/scripts/${input:scriptName}.scala -- ${fileDirname}",
+      "group" : {
+        "kind" : "build",
+        "isDefault" : false
+      },
+      "problemMatcher" : [],
+      "presentation" : {
+        "echo" : true,
+        "reveal" : "always",
+        "focus": true,
+        "panel" : "shared"
+      }
+    }
+  ],
+  "inputs" : [
+    {
+      "id" : "scriptName",
+      "type" : "pickString",
+      "description" : "Pick script to run:",
+      "options": [
+        "sv_gen"
+      ],
+      "default" : "main"
+    }
+  ]
+}
