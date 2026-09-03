@@ -25,5 +25,35 @@ import io.circe.parser.parse as parseJson
         identity
     )
 
-    println(baseJson.spaces2)
+    val scriptDir = currentDir / "scripts"
+
+    // Check for scripts folder
+    if !os.exists(scriptDir) then
+        println(s"Error: no scripts folder found on: $scriptDir")
+        sys.exit(1)
+
+    // Extract scripts name list, then create an array for select option
+    val scriptFiles = os.list(scriptDir)
+        .filter(_.ext == "scala")
+        .map(_.last.stripSuffix(".scala"))
+        .toList.sorted
+    val optionsArray = Json.fromValues(scriptFiles.map(str => Json.fromString(str)))
+    // create Json from the output of a map, where the input is each string in List and mapped into Json string
+
+    // Assume scriptName is the first element of the input array
+    val updatedJson = baseJson.hcursor
+        .downField("inputs")
+        .downArray
+        .downField("options")
+        .set(optionsArray)
+        .top
+        .getOrElse(baseJson)
+    
+    //println(updatedJson.spaces2)
+
+    // Overwrite the tasks.json
+    val formattedJsonStr = Printer.spaces2.copy(dropNullValues = true).print(updatedJson)
+    os.write.over(tasksJsonFile, formattedJsonStr, createFolders = true)
+
+    println(s"Successfully updated toolkit, scripts available: ${scriptFiles.mkString(", ")}")
 }
