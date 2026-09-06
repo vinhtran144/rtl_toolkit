@@ -20,7 +20,24 @@
     {
       "label" : "Toolkit: Execute scripts",
       "type" : "shell",
-      "command" : "scala run ${workspaceFolder}/scripts/${input:scriptName}.scala -- ${fileDirname}",
+      "command" : "scala run ${workspaceFolder}/scripts/${input:execSriptName}.scala -- ${fileDirname}",
+      "group" : {
+        "kind" : "build",
+        "isDefault" : false
+      },
+      "problemMatcher" : [
+      ],
+      "presentation" : {
+        "echo" : true,
+        "reveal" : "always",
+        "focus" : true,
+        "panel" : "shared"
+      }
+    },
+    {
+      "label" : "Toolkit: Generate components",
+      "type" : "shell",
+      "command" : "scala run ${workspaceFolder}/scripts/gen_${input:genScriptName}.scala -- ${fileDirname} ${input:projectName}",
       "group" : {
         "kind" : "build",
         "isDefault" : false
@@ -37,13 +54,24 @@
   ],
   "inputs" : [
     {
-      "id" : "scriptName",
+      "id" : "execSriptName",
       "type" : "pickString",
-      "description" : "Pick script to run:",
+      "description" : "Select execute script to run:",
       "options" : [
         "sv_gen"
-      ],
-      "default" : "main"
+      ]
+    },
+    {
+      "id": "genScriptName",
+      "type": "pickString",
+      "description": "Select generation script to run:",
+      "options": []
+    },
+    {
+      "id": "projectName",
+      "type": "promptString",
+      "description": "Enter new project name:",
+      "default": "new_project"
     }
   ]
 }
