@@ -58,7 +58,7 @@
       "type" : "pickString",
       "description" : "Select execute script to run:",
       "options" : [
-        "sv_gen"
+        "dir_test"
       ]
     },
     {
@@ -66,6 +66,7 @@
       "type" : "pickString",
       "description" : "Select generation script to run:",
       "options" : [
+        "sv_interface"
       ]
     },
     {
