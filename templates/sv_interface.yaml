@@ -1,0 +1,30 @@
+dirs:
+  - "src/rtl"
+  - "src/task"
+  - "tb"
+
+files:
+  - template: "filelist.f.hbs"
+    output_dir: ""
+
+  - template: "pkg.sv.hbs"
+    output_dir: "src/rtl"
+
+  - template: "signals.svh.hbs"
+    output_dir: "src/rtl"
+
+  - template: "task.svh.hbs"
+    output_dir: "src/task"
+    type: "driver"
+
+  - template: "task.svh.hbs"
+    output_dir: "src/task"
+    type: "monitor"
+
+  - template: "task_tb.sv.hbs"
+    output_dir: "tb"
+    type: "driver"
+
+  - template: "task_tb.sv.hbs"
+    output_dir: "tb"
+    type: "monitor"
