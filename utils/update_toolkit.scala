@@ -37,23 +37,42 @@ import io.circe.parser.parse as parseJson
         .filter(_.ext == "scala")
         .map(_.last.stripSuffix(".scala"))
         .toList.sorted
-    val optionsArray = Json.fromValues(scriptFiles.map(str => Json.fromString(str)))
+
+    // generation scripts have prefix gen_, everything else execution scripts
+    val (genScripts, execScripts) = scriptFiles
+        .partition(_.startsWith("gen_"))
+
+    val genArray = Json.fromValues(genScripts.map(str => Json.fromString(str.stripPrefix("gen_"))))
+    val execArray = Json.fromValues(execScripts.map(str => Json.fromString(str)))
     // create Json from the output of a map, where the input is each string in List and mapped into Json string
 
-    // Assume scriptName is the first element of the input array
+    // execArray is for execScriptName
+    // genArray is for genScriptName
+
     val updatedJson = baseJson.hcursor
         .downField("inputs")
-        .downArray
-        .downField("options")
-        .set(optionsArray)
+        .withFocus(_.mapArray{ inputsVector =>  // circle lib, unpack into Vector[Json]
+            inputsVector.map{ inputJson =>      // scala, each input is a Json
+                inputJson.hcursor.downField("id").as[String].toOption match
+                    case Some("execScriptName") =>      
+                        inputJson.hcursor.downField("options").set(execArray).top.getOrElse(inputJson)
+                    case Some("genScriptName") =>
+                        inputJson.hcursor.downField("options").set(genArray).top.getOrElse(inputJson)
+                    case _ => 
+                        inputJson // Leave other inputs (e.g. targetName prompt) untouched
+    }
+
+        })
         .top
         .getOrElse(baseJson)
     
-    //println(updatedJson.spaces2)
+    // println(updatedJson.spaces2)
 
     // Overwrite the tasks.json
     val formattedJsonStr = Printer.spaces2.copy(dropNullValues = true).print(updatedJson)
     os.write.over(tasksJsonFile, formattedJsonStr, createFolders = true)
 
-    println(s"Successfully updated toolkit, scripts available: ${scriptFiles.mkString(", ")}")
+    println(s"Successfully updated toolkit")
+    println(s"Execution scripts: ${execScripts.mkString(", ")}")
+    println(s"Generation scripts: ${genScripts.map(str => str.stripPrefix("gen_")).mkString(", ")}")
 }

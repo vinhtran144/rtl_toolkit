@@ -20,7 +20,7 @@
     {
       "label" : "Toolkit: Execute scripts",
       "type" : "shell",
-      "command" : "scala run ${workspaceFolder}/scripts/${input:execSriptName}.scala -- ${fileDirname}",
+      "command" : "scala run ${workspaceFolder}/scripts/${input:execScriptName}.scala -- ${fileDirname}",
       "group" : {
         "kind" : "build",
         "isDefault" : false
@@ -54,7 +54,7 @@
   ],
   "inputs" : [
     {
-      "id" : "execSriptName",
+      "id" : "execScriptName",
       "type" : "pickString",
       "description" : "Select execute script to run:",
       "options" : [
@@ -62,16 +62,17 @@
       ]
     },
     {
-      "id": "genScriptName",
-      "type": "pickString",
-      "description": "Select generation script to run:",
-      "options": []
+      "id" : "genScriptName",
+      "type" : "pickString",
+      "description" : "Select generation script to run:",
+      "options" : [
+      ]
     },
     {
-      "id": "projectName",
-      "type": "promptString",
-      "description": "Enter new project name:",
-      "default": "new_project"
+      "id" : "projectName",
+      "type" : "promptString",
+      "description" : "Enter new project name:",
+      "default" : "new_project"
     }
   ]
 }
