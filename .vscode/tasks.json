@@ -2,9 +2,9 @@
   "version" : "2.0.0",
   "tasks" : [
     {
-      "label" : "Utils: Update Toolkit",
+      "label" : "Update Toolkit",
       "type" : "shell",
-      "command" : "scala run ${workspaceFolder}/utils/update_toolkit.scala",
+      "command" : "scala run ${workspaceFolder}/scripts/update_toolkit.scala",
       "problemMatcher" : [
       ],
       "group" : {

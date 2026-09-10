@@ -37,6 +37,7 @@ import io.circe.parser.parse as parseJson
     val scriptFiles = os.list(scriptDir)
         .filter(_.ext == "scala")
         .map(_.last.stripSuffix(".scala"))
+        .filterNot(_ == "update_toolkit")
         .toList.sorted
 
     // generation scripts have prefix gen_, everything else execution scripts

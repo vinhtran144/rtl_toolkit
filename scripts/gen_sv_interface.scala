@@ -13,16 +13,11 @@ import os.call
 case class ProjectDirs(dirs: List[String])
 
 @main def genSVInterface(args: String*): Unit =
-    val usageMsg   = "scala run gen_sv_interface.scala -- <workspace_dir> <interface_name>"
     val templateDir = os.pwd / "templates"
     val interfaceTemp = templateDir / "sv_interface.yaml"
 
-    val callCheck: Either[String,  (os.Path, String)] = for 
-        (targetDir, projectName) <- validator.validateDirAndName(args, usageMsg)
-        _ <- validator.checkFilesExist(Seq(templateDir, interfaceTemp))
-    yield (targetDir, projectName)
-
-    val (targetDir, projectName) = validator.unwrapOrExit(callCheck)
+    val currentScriptName = "gen_sv_interface.scala"
+    val (targetDir, projectName) = validator.validateDirAndName(args, currentScriptName)
     
     val rawYaml =os.read(interfaceTemp)
     // Parse YAML into ProjectDir case class
