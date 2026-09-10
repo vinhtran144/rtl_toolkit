@@ -3,39 +3,33 @@
 //> using dep io.circe::circe-core:0.14.16
 //> using dep io.circe::circe-generic:0.14.16
 //> using dep io.circe::circe-yaml:1.15.0
+//> using file ../utils
 
+import toolkitUtils.*
 import io.circe.yaml.parser as yamlParser
 import io.circe.generic.auto.*
+import os.call
 
 case class ProjectDirs(dirs: List[String])
 
 @main def genSVInterface(args: String*): Unit =
-    // Checking for required 2 input arguments
-    if args.length < 2 then
-        println("Error: Not enough input arguments, require 1. Target dir, 2. Project name")
-        sys.exit(1)
-    
-    val targetDir = os.Path(args(0), os.pwd)
-    val projectName = args(1)
-
-    // check if the target Dir exists
-    if !os.exists(targetDir) then
-        println(s"Error, $targetDir isn't a valid directory")
-        sys.exit(1)
-
+    val usageMsg   = "scala run gen_sv_interface.scala -- <workspace_dir> <interface_name>"
     val templateDir = os.pwd / "templates"
     val interfaceTemp = templateDir / "sv_interface.yaml"
-    if !os.exists(interfaceTemp) then
-        println(s"Error: YAML config missing on: $interfaceTemp")
-        sys.exit(1)
 
+    val callCheck: Either[String,  (os.Path, String)] = for 
+        (targetDir, projectName) <- validator.validateDirAndName(args, usageMsg)
+        _ <- validator.checkFilesExist(Seq(templateDir, interfaceTemp))
+    yield (targetDir, projectName)
+
+    val (targetDir, projectName) = validator.unwrapOrExit(callCheck)
+    
     val rawYaml =os.read(interfaceTemp)
     // Parse YAML into ProjectDir case class
     val dirConfig = for 
         json <- yamlParser.parse(rawYaml)
         config <- json.as[ProjectDirs]
     yield config
-    // Returns Either[LeftType, RightType]
 
     dirConfig match
         case Left(err) =>
