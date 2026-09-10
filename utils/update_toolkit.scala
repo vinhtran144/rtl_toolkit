@@ -2,34 +2,36 @@
 //> using dep com.lihaoyi::os-lib:0.11.8
 //> using dep io.circe::circe-core:0.14.16
 //> using dep io.circe::circe-parser:0.14.16
+//> using file ../utils
 
+import toolkitUtils.*
 import io.circe.*
 import io.circe.parser.parse as parseJson
 
 @main def toolkitUpdater(args: String*): Unit = {
     val currentDir = os.pwd
-    // Get the directory of tasks.json
+    val scriptDir = currentDir / "scripts"
     val tasksJsonFile = currentDir / ".vscode" / "tasks.json"
 
-    // check for tasks.json
-    if !os.exists(tasksJsonFile) then
-        println(s"Error: tasks.json is not found on: $tasksJsonFile")
-        sys.exit(1)
+    val validateToolkit: Either[String, Json] = for
+        // Check that both tasks.json and scripts/ folder exist
+        _ <- validator.checkFilesExist(Seq(tasksJsonFile, scriptDir))
 
-    //Attempt to parse JSON into scala
-    val baseJson = parseJson(os.read(tasksJsonFile)).fold(
-        err => 
-            println(s"Error: Failed to parse $tasksJsonFile: ${err.getMessage}")
-            sys.exit(1),
-        identity
-    )
+        // Attempt to read and parse tasks.json safely
+        rawJson = os.read(tasksJsonFile)
+        parsedJson <- parseJson(rawJson).left.map { err =>
+            s"Failed to parse JSON at $tasksJsonFile: ${err.getMessage}"
+        }
+    yield parsedJson
 
-    val scriptDir = currentDir / "scripts"
+    // validateToolkit is Either, with Left being error message String, and Right if everything is success
+    val baseJson = validateToolkit match
+    case Left(errorMsg) =>
+      println(s"Error: $errorMsg")
+      sys.exit(1)
 
-    // Check for scripts folder
-    if !os.exists(scriptDir) then
-        println(s"Error: no scripts folder found on: $scriptDir")
-        sys.exit(1)
+    case Right(json) =>
+      json
 
     // Extract scripts name list, then create an array for select option
     val scriptFiles = os.list(scriptDir)

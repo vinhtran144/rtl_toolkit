@@ -13,6 +13,7 @@ object validator:
         try Right(os.Path(rawPath, os.pwd))
         catch case ex: Exception => Left(s"Invalid target directory '$rawPath': ${ex.getMessage}")
 
+    // Note, using Seq, so a list of os.Path can be added
     def checkFilesExist(paths: Seq[os.Path]): Either[String, Unit] =
         val missing = paths.filterNot(os.exists)
         if missing.isEmpty then
