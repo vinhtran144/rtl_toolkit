@@ -1,7 +1,5 @@
 package toolkitUtils
 
-// Validate Utils, returns Either
-
 object validator:
     def checkArgCount(args: Seq[String], minCount: Int, usageMsg: String): Either[String, Unit] =
     if args.length >= minCount then
