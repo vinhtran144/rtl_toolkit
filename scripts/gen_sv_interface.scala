@@ -10,8 +10,6 @@ import io.circe.yaml.parser as yamlParser
 import io.circe.generic.auto.*
 import os.call
 
-case class ProjectDirs(dirs: List[String])
-
 @main def genSVInterface(args: String*): Unit =
     val templateDir = os.pwd / "templates"
     val interfaceConfig = templateDir / "sv_interface.yaml"
@@ -20,8 +18,7 @@ case class ProjectDirs(dirs: List[String])
     val (targetDir, projectName) = validator.validateDirAndName(args, currentScriptName)
     
     val (dirsConfig, filesConfig) = generator.extractYamlConfig(interfaceConfig)
-    // println(dirsConfig)
-    // println(filesConfig)
 
     generator.generateDirs(dirsConfig, targetDir)
+    generator.generateFiles(filesConfig, targetDir, projectName)
     

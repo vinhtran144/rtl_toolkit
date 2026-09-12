@@ -15,16 +15,16 @@ files:
 
   - template: "task.svh.hbs"
     output_dir: "src/task"
-    type: "driver"
+    file_type: "driver"
 
   - template: "task.svh.hbs"
     output_dir: "src/task"
-    type: "monitor"
+    file_type: "monitor"
 
   - template: "task_tb.sv.hbs"
     output_dir: "tb"
-    type: "driver"
+    file_type: "driver"
 
   - template: "task_tb.sv.hbs"
     output_dir: "tb"
-    type: "monitor"
+    file_type: "monitor"
