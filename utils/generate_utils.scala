@@ -44,9 +44,7 @@ object generator:
             "name" -> projectName.trim,              // replace {{name}} with projectName
             "NAME" -> projectName.trim.toUpperCase   // ie. change axi_bus to AXI_BUS, for macros
         ) ++ extraContext                            // Add any other Map to hbs template 
-        
-        val templateDir = os.pwd / "templates"
-        validator.unwrapOrExit(validator.checkFilesExist(Seq(templateDir)))
+               
         println(filesConfig)
         for fileSpec <- filesConfig.files do
             val fileName = constructFileName(

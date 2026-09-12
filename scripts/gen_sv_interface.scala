@@ -13,6 +13,7 @@ import os.call
 @main def genSVInterface(args: String*): Unit =
     val templateDir = os.pwd / "templates"
     val interfaceConfig = templateDir / "sv_interface.yaml"
+    validator.unwrapOrExit(validator.checkFilesExist(Seq(templateDir, interfaceConfig)))
 
     val currentScriptName = "gen_sv_interface.scala"
     val (targetDir, projectName) = validator.validateDirAndName(args, currentScriptName)

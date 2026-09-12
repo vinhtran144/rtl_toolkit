@@ -1,6 +1,8 @@
 //> using scala 3.8.4
 //> using dep com.lihaoyi::os-lib:0.11.8
 //> using dep io.circe::circe-core:0.14.16
+//> using dep io.circe::circe-generic:0.14.16
+//> using dep io.circe::circe-yaml:1.15.0
 //> using dep io.circe::circe-parser:0.14.16
 //> using file ../utils
 
@@ -25,13 +27,7 @@ import io.circe.parser.parse as parseJson
     yield parsedJson
 
     // validateToolkit is Either, with Left being error message String, and Right if everything is success
-    val baseJson = validateToolkit match
-    case Left(errorMsg) =>
-      println(s"Error: $errorMsg")
-      sys.exit(1)
-
-    case Right(json) =>
-      json
+    val baseJson =  validator.unwrapOrExit(validateToolkit)
 
     // Extract scripts name list, then create an array for select option
     val scriptFiles = os.list(scriptDir)
