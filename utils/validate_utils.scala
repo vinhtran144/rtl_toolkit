@@ -8,8 +8,18 @@ object validator:
       Left(s"Insufficient arguments.\nUsage: $usageMsg")
 
     def checkTargetDir(rawPath: String): Either[String, os.Path] =
-        try Right(os.Path(rawPath, os.pwd))
-        catch case ex: Exception => Left(s"Invalid target directory '$rawPath': ${ex.getMessage}")
+        for 
+            targetPath <-  try Right(os.Path(rawPath, os.pwd))
+                            catch case ex: Exception => Left(s"Invalid target directory '$rawPath': ${ex.getMessage}")
+            // Check for correct Path syntax
+            _          <- if os.exists(targetPath) && os.stat(targetPath).isDir then Right(())
+                            else Left(s"Target directory does not exist: $targetPath")
+            // Check for target being path And a directory 
+            _          <- if !targetPath.startsWith(os.pwd) then Right(())
+                            else Left(s"Target directory cannot be the toolkit ($targetPath)")
+            // Check for toolkit dir, so scripts can't be called within toolbox
+        
+        yield targetPath
 
     // Note, using Seq, so a list of os.Path can be added
     def checkFilesExist(paths: Seq[os.Path]): Either[String, Unit] =
