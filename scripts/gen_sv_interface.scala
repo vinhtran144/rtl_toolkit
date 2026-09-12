@@ -20,18 +20,8 @@ case class ProjectDirs(dirs: List[String])
     val (targetDir, projectName) = validator.validateDirAndName(args, currentScriptName)
     
     val (dirsConfig, filesConfig) = generator.extractYamlConfig(interfaceConfig)
-    println(dirsConfig)
-    println(filesConfig)
+    // println(dirsConfig)
+    // println(filesConfig)
 
-    // dirConfig match
-    //     case Left(err) =>
-    //         println(s"Error parsing YAML: ${err.getMessage}")
-    //         sys.exit(1)
-
-    //     case Right(cfg) =>
-    //         // Create folders from yaml template
-    //         for dir <- cfg.dirs if dir.trim.nonEmpty do
-    //             val dirPath = targetDir / os.RelPath(dir)
-    //             os.makeDir.all(dirPath)
-    //             println(s"Created folder: $dir")
+    generator.generateDirs(dirsConfig, targetDir)
     

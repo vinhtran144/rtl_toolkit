@@ -1,6 +1,5 @@
 package toolkitUtils
 
-
 // Data models for YAML structure
 case class ProjectDirs(dirs: List[String] = Nil)
 case class ProjectFiles(files: List[ProjectFileSpec] = Nil)
@@ -24,3 +23,12 @@ object generator:
         yield (dirs, files)
 
         validator.unwrapOrExit(projectConfig)
+    
+    def generateDirs(dirsConfig: ProjectDirs, targetWorkspace: os.Path): Unit =
+        for dir <- dirsConfig.dirs if dir.trim.nonEmpty do
+            val dirPath = targetWorkspace / os.RelPath(dir)
+            if os.exists(dirPath) then
+                println(s"Directory $dirPath already exists")
+            else
+                os.makeDir.all(dirPath)
+                println(s"Created directory: $dirPath")

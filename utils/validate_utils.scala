@@ -34,13 +34,13 @@ object validator:
       scriptName: String
      ): (os.Path, String) =
         val usageMsg   = s"scala run $scriptName -- <target_dir> <project_name>"
-        val checkCall = for
+        val callCheck = for
             _ <- checkArgCount(args, 2, usageMsg)
             targetDir <- checkTargetDir(args(0))
 
             projectName = args(1)
         yield (targetDir, projectName)
-        unwrapOrExit(checkCall)
+        unwrapOrExit(callCheck)
 
      // returns ONLY Target path
     def validateDir(
@@ -48,8 +48,8 @@ object validator:
       scriptName: String
      ): os.Path =
         val usageMsg = s"scala run $scriptName -- <target_dir> "
-        val checkCall = for
+        val callCheck = for
             _ <- checkArgCount(args, 1, usageMsg)
             targetDir <- checkTargetDir(args(0))
         yield (targetDir)
-        unwrapOrExit(checkCall)
+        unwrapOrExit(callCheck)
