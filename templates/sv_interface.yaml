@@ -4,9 +4,6 @@ dirs:
   - "tb"
 
 files:
-  - template: "filelist.f.hbs"
-    output_dir: ""
-
   - template: "pkg.sv.hbs"
     output_dir: "src/rtl"
 

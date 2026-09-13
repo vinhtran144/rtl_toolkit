@@ -18,8 +18,10 @@ import os.call
     val currentScriptName = "gen_sv_interface.scala"
     val (targetDir, projectName) = validator.validateDirAndName(args, currentScriptName)
     
-    val (dirsConfig, filesConfig) = generator.extractYamlConfig(interfaceConfig)
+    val (dirsConfig, filesConfig, filelistContext) = generator.extractYamlConfig(interfaceConfig,projectName)
+
+    println(filelistContext)
 
     generator.generateDirs(dirsConfig, targetDir)
-    generator.generateFiles(filesConfig, targetDir, projectName)
+    generator.generateFiles(filesConfig, targetDir, projectName, filelistContext)
     
