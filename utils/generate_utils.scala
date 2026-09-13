@@ -1,7 +1,5 @@
 package toolkitUtils
 
-import cats.instances.double
-
 // Data models for YAML structure
 case class ProjectDirs(dirs: List[String] = Nil)
 case class ProjectFiles(files: List[ProjectFileSpec] = Nil)
@@ -34,8 +32,8 @@ object generator:
                 val fileDir = fileSpec.output_dir       
                 s"$fileDir/$fileName"               // Append dir to the names
             }   
-            val filelistContext = extractContext(filesPaths)
-            (dirs, files, filelistContext)
+            val generateContext = extractContext(filesPaths)
+            (dirs, files, generateContext)
 
         validator.unwrapOrExit(projectConfig)
 
@@ -115,6 +113,8 @@ object generator:
                 println(s"Warning: Template not found $templatePath, skip generation")
             else 
                 val templateRaw = os.read(templatePath)
+                val renderedContent = HandlebarsRenderer.render(templateRaw, context)
+                os.write.over(filePath, renderedContent)
             
     // Name constructed structure: <project_name>_<file_type>_<template>
     // Example project_name = mem_bus, file_type = monitor, template = task.svh.hbs
