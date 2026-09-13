@@ -37,8 +37,7 @@ object generator:
             val includeDirs = filesPaths
                 .filter(_.endsWith(".svh"))             // Get all header files
                 .map { p =>
-                    // Get directory to the file
-                    val lastSlash = p.lastIndexOf('/')
+                    val lastSlash = p.lastIndexOf('/') // Get directory to the file
                     if lastSlash > 0 then
                         p.substring(0, lastSlash) 
                     else ""
@@ -46,14 +45,33 @@ object generator:
                 .filter(_.nonEmpty)
                 .distinct                               // remove duplicates
             
+            // Get all files ends with .sv to be source files
             val sourceFiles = filesPaths
                 .filter(p => p.endsWith(".sv") || p.endsWith(".v")) // Get sources files
                 .distinct
 
+            // Check if there's package, supposed to be 1 singular, fixed <projectName>_pkg
+            val hasPkg : Boolean = sourceFiles.filter(_.contains("_pkg")).nonEmpty
+
+            // Extract single io_param and io_sig headers 
+            val paramHeader: String = filesPaths
+                .find(_.contains("io_param.svh"))
+                .getOrElse("")
+            val sigHeader: String = filesPaths
+                .find(_.contains("io_sig.svh"))
+                .getOrElse("")
+            
+            // Get list of task headers
+            val taskHeaders = filesPaths.filter(_.contains("task.svh"))
+
             // Construct context for filelist
             val filelistContext: Map[String, Any] = Map(
                 "include_dirs" -> includeDirs,
-                "source_files" -> sourceFiles
+                "source_files" -> sourceFiles,
+                "hasPkg"       -> hasPkg,
+                "module_param" -> paramHeader,
+                "module_sign"  -> sigHeader,
+                "task_header"  -> taskHeaders
             )
             (dirs, files, filelistContext)
 

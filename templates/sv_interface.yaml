@@ -4,10 +4,19 @@ dirs:
   - "tb"
 
 files:
+  - template: "filelist.f.hbs"
+    output_dir: ""
+
+  - template: "top.sv.hbs"
+    output_dir: ""
+
   - template: "pkg.sv.hbs"
     output_dir: "src/rtl"
 
-  - template: "signals.svh.hbs"
+  - template: "io_param.svh.hbs"
+    output_dir: "src/rtl"
+  
+  - template: "io_sig.svh.hbs"
     output_dir: "src/rtl"
 
   - template: "task.svh.hbs"
