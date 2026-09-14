@@ -5,11 +5,11 @@
 //> using dep io.circe::circe-yaml:1.15.0
 //> using dep com.github.jknack:handlebars:4.5.4
 //> using dep org.slf4j:slf4j-nop:2.0.19
-//> using file ../utils
+//> using file ../utils 
  
 import toolkitUtils.*
 
-@main def genSVInterface(args: String*): Unit =
+@main def genSvInterface(args: String*): Unit =
     val templateDir = os.pwd / "templates"
     val interfaceConfig = templateDir / "sv_interface.yaml"
     validator.unwrapOrExit(validator.checkFilesExist(Seq(templateDir, interfaceConfig)))

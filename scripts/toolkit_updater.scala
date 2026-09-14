@@ -4,6 +4,7 @@
 //> using dep io.circe::circe-generic:0.14.16
 //> using dep io.circe::circe-yaml:1.15.0
 //> using dep io.circe::circe-parser:0.14.16
+//> using dep com.github.jknack:handlebars:4.5.4
 //> using file ../utils
 
 import toolkitUtils.*
