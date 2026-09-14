@@ -4,7 +4,14 @@
     {
       "label" : "Update Toolkit",
       "type" : "shell",
-      "command" : "scala run ${workspaceFolder}/scripts/toolkit_updater.scala",
+      "command" : "scala",
+      "args" : [
+        "run",
+        ".",
+        "${workspaceFolder}/utils/toolkit_updater.scala",
+        "--main-class",
+        "toolkitUpdater"
+      ],
       "problemMatcher" : [
       ],
       "group" : {
@@ -20,7 +27,20 @@
     {
       "label" : "Toolkit: Execute scripts",
       "type" : "shell",
-      "command" : "scala run ${workspaceFolder}/scripts/${input:execScriptName}.scala -- ${fileDirname}",
+      "command" : "scala",
+      "args" : [
+        "run",
+        ".",
+        "${workspaceFolder}/utils/script_runner.scala",
+        "--main-class",
+        "scriptRunner",
+        "--",
+        "false",
+        "${input:execScriptName}",
+        "${workspaceFolder}",
+        "${fileDirname}",
+        "placeholder"
+      ],
       "group" : {
         "kind" : "build",
         "isDefault" : false
@@ -37,26 +57,13 @@
     {
       "label" : "Toolkit: Generate components",
       "type" : "shell",
-      "command" : "scala run ${workspaceFolder}/scripts/gen_${input:genScriptName}.scala -- ${fileDirname} ${input:projectName}",
-      "group" : {
-        "kind" : "build",
-        "isDefault" : false
-      },
-      "problemMatcher" : [
-      ],
-      "presentation" : {
-        "echo" : true,
-        "reveal" : "always",
-        "focus" : true,
-        "panel" : "shared"
-      }
-    },{
-      "label" : "Toolkit: Generate components proto",
-      "type" : "shell",
       "command" : "scala",
-      "args": [
+      "args" : [
         "run",
+        ".",
         "${workspaceFolder}/utils/script_runner.scala",
+        "--main-class",
+        "scriptRunner",
         "--",
         "true",
         "${input:genScriptName}",
@@ -84,8 +91,7 @@
       "type" : "pickString",
       "description" : "Select execute script to run:",
       "options" : [
-        "dir_test",
-        "toolkit_updater"
+        "dir_test"
       ]
     },
     {

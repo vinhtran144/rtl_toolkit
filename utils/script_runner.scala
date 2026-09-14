@@ -1,4 +1,3 @@
-//> using scala 3.8.4
 import scala.sys.process.*
 
 @main def scriptRunner(isGen: Boolean, scriptName: String, currentDir: String, targetDir: String, extraArg: String = ""): Unit =
@@ -18,7 +17,7 @@ import scala.sys.process.*
     val scalaExec = if isWindows then "scala-cli.bat" else "scala-cli"
 
     val baseCmd = Seq(
-        scalaExec, "run", targetScript,
+        scalaExec, "run", ".", targetScript,
         "--main-class", mainClass,
         "--", targetDir
     )

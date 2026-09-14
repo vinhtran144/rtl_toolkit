@@ -1,12 +1,3 @@
-//> using scala 3.8.4
-//> using dep com.lihaoyi::os-lib:0.11.8
-//> using dep io.circe::circe-core:0.14.16
-//> using dep io.circe::circe-generic:0.14.16
-//> using dep io.circe::circe-yaml:1.15.0
-//> using dep io.circe::circe-parser:0.14.16
-//> using dep com.github.jknack:handlebars:4.5.4
-//> using file ../utils
-
 import toolkitUtils.*
 import io.circe.*
 import io.circe.parser.parse as parseJson
