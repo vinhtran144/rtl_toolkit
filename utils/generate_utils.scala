@@ -65,6 +65,8 @@ object generator:
             .find(_.contains("io_sig.svh"))
             .getOrElse("")
         
+        // Get list of logic headers
+        val logicHeaders = filesPaths.filter(_.contains("logic.svh"))
         // Get list of task headers
         val taskHeaders = filesPaths.filter(_.contains("task.svh"))
 
@@ -75,6 +77,7 @@ object generator:
             "hasPkg"       -> hasPkg,
             "module_param" -> paramHeader,
             "module_sign"  -> sigHeader,
+            "logic_header" -> logicHeaders,
             "task_header"  -> taskHeaders
         )
 

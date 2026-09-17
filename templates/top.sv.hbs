@@ -1,8 +1,17 @@
-{{name}}
-{{NAME}}
-{{module_param}}
-{{module_sign}}
-
-{{#each task_header}}
-    `include "{{this}}"
+{{#each task_header}}`include "{{this}}"
 {{/each}}
+
+`timescale 1ns / 1ps
+
+{{#if hasPkg}}import {{name}}_pkg::*;
+{{/if}}
+
+interface {{name}}_if #(`include {{module_param}})(`include {{module_sign}});
+
+    {{#each logic_header}}`include "{{this}}"
+    {{/each}}
+
+    {{#each task_header}}`include "{{this}}"
+    {{/each}}
+
+endinterface : {{name}}_if

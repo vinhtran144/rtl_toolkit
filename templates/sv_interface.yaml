@@ -19,6 +19,10 @@ files:
   - template: "io_sig.svh.hbs"
     output_dir: "src/rtl"
 
+  - template: "logic.svh.hbs"
+    output_dir: "src/rtl"
+    file_type: "port"
+
   - template: "task.svh.hbs"
     output_dir: "src/task"
     file_type: "driver"
