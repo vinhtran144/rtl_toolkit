@@ -1,12 +1,9 @@
-{{#each task_header}}`include "{{this}}"
-{{/each}}
-
 `timescale 1ns / 1ps
 
 {{#if hasPkg}}import {{name}}_pkg::*;
 {{/if}}
 
-interface {{name}}_if #(`include {{module_param}})(`include {{module_sign}});
+interface {{name}}_if #(`include "{{module_param}}")(`include "{{module_sign}}");
 
     {{#each logic_header}}`include "{{this}}"
     {{/each}}

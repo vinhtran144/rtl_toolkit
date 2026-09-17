@@ -22,22 +22,24 @@ object generator:
             files   <- json.as[ProjectFiles]
                         .left.map(err => s"Failed decoding 'files' in $configYaml: ${err.getMessage}")
         yield 
-            val filesPaths = files.files.map { fileSpec =>
+            val (filesPaths, filesNames) = files.files.map { fileSpec =>
                  // Construct filename 
                 val fileName = constructFileName(  
                     inputName    = projectName.trim,
                     fileType     = fileSpec.file_type,
                     templateName = fileSpec.template
                 )
-                val fileDir = fileSpec.output_dir       
-                s"$fileDir/$fileName"               // Append dir to the names
-            }   
-            val generateContext = extractContext(filesPaths)
+                val filePath = s"${fileSpec.output_dir}/$fileName"     // Append dir to the names
+                (filePath,fileName)
+            }.unzip
+            val contextPaths = extractPathContext(filesPaths)
+            val contextNames = extractNameContext(filesNames)
+            val generateContext = contextPaths ++ contextNames
             (dirs, files, generateContext)
 
         validator.unwrapOrExit(projectConfig)
 
-    private def extractContext(filesPaths: List[String]): Map[String, Any] =
+    private def extractPathContext(filesPaths: List[String]): Map[String, Any] =
         val includeDirs = filesPaths
             .filter(_.endsWith(".svh"))             // Get all header files
             .map { p =>
@@ -54,26 +56,30 @@ object generator:
             .filter(p => p.endsWith(".sv") || p.endsWith(".v")) // Get sources files
             .distinct
 
+        Map(
+            "include_dirs" -> includeDirs,
+            "source_files" -> sourceFiles            
+        )
+
+    private def extractNameContext(filesNames: List[String]): Map[String, Any] =
         // Check if there's package, supposed to be 1 singular, fixed <projectName>_pkg
-        val hasPkg : Boolean = sourceFiles.filter(_.contains("_pkg")).nonEmpty
+        val hasPkg : Boolean = filesNames.filter(_.contains("_pkg")).nonEmpty
 
         // Extract single io_param and io_sig headers 
-        val paramHeader: String = filesPaths
+        val paramHeader: String = filesNames
             .find(_.contains("io_param.svh"))
             .getOrElse("")
-        val sigHeader: String = filesPaths
+        val sigHeader: String = filesNames
             .find(_.contains("io_sig.svh"))
             .getOrElse("")
         
         // Get list of logic headers
-        val logicHeaders = filesPaths.filter(_.contains("logic.svh"))
+        val logicHeaders = filesNames.filter(_.contains("logic.svh"))
         // Get list of task headers
-        val taskHeaders = filesPaths.filter(_.contains("task.svh"))
+        val taskHeaders = filesNames.filter(_.contains("task.svh"))
 
         // Construct context for extractContext
         Map(
-            "include_dirs" -> includeDirs,
-            "source_files" -> sourceFiles,
             "hasPkg"       -> hasPkg,
             "module_param" -> paramHeader,
             "module_sign"  -> sigHeader,
