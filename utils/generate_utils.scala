@@ -29,7 +29,10 @@ object generator:
                     fileType     = fileSpec.file_type,
                     templateName = fileSpec.template
                 )
-                val filePath = s"${fileSpec.output_dir}/$fileName"     // Append dir to the names
+                val filePath = if (fileSpec.output_dir == "")  then 
+                    s"./$fileName" 
+                else 
+                    s"${fileSpec.output_dir}/$fileName"     // Append dir to the names
                 (filePath,fileName)
             }.unzip
             val contextPaths = extractPathContext(filesPaths)
@@ -102,8 +105,8 @@ object generator:
         extraContext: Map[String, Any] = Map.empty): Unit =
         
         val context = Map(
-            "name" -> projectName.trim,              // replace {{name}} with projectName
-            "NAME" -> projectName.trim.toUpperCase   // ie. change axi_bus to AXI_BUS, for macros
+            "project_name" -> projectName.trim,              // replace {{name}} with projectName
+            "PROJECT_NAME" -> projectName.trim.toUpperCase   // ie. change axi_bus to AXI_BUS, for macros
         ) ++ extraContext                            // Add any other Map to hbs template 
                
         for fileSpec <- filesConfig.files do
@@ -114,6 +117,13 @@ object generator:
             )
             val filePath = targetDir / os.RelPath(fileSpec.output_dir) / fileName
             val templatePath = os.pwd / "templates" / fileSpec.template
+
+            // Append file_type to render specific types
+            val fileContext = if (fileSpec.file_type.exists(_.trim.nonEmpty)){
+               context ++ Map(
+                "file_type" -> fileSpec.file_type.get.toLowerCase
+            )} else
+                context
         
             // target file check
             if os.exists(filePath) then
@@ -122,8 +132,9 @@ object generator:
                 println(s"Warning: Template not found $templatePath, skip generation")
             else 
                 val templateRaw = os.read(templatePath)
-                val renderedContent = HandlebarsRenderer.render(templateRaw, context)
+                val renderedContent = HandlebarsRenderer.render(templateRaw, fileContext)
                 os.write.over(filePath, renderedContent)
+                println(s"Successfully generated $filePath")
             
     // Name constructed structure: <project_name>_<file_type>_<template>
     // Example project_name = mem_bus, file_type = monitor, template = task.svh.hbs

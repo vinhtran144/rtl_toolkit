@@ -9,6 +9,7 @@ files:
 
   - template: "top.sv.hbs"
     output_dir: ""
+    file_type: "if"
 
   - template: "pkg.sv.hbs"
     output_dir: "src/rtl"
