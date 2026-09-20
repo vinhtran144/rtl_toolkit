@@ -1,8 +1,6 @@
 `timescale 1ns / 1ps
-
 {{#if hasPkg}}import {{project_name}}_pkg::*;
 {{/if}}
-
 {{#eq file_type "if"}}
 interface {{project_name}}_if #(`include "{{module_param}}")(`include "{{module_sign}}");
     {{#each logic_header}}`include "{{this}}"
@@ -14,7 +12,7 @@ interface {{project_name}}_if #(`include "{{module_param}}")(`include "{{module_
 endinterface : {{project_name}}_if
 
 {{else}}
-module {{projectName}} #(`include "{{module_param}}")(`include "{{module_sign}}");
+module {{project_name}} #(`include "{{module_param}}")(`include "{{module_sign}}");
     {{#each logic_header}}`include "{{this}}"
     {{/each}}
 

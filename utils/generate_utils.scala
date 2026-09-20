@@ -10,17 +10,17 @@ import io.circe.yaml.parser as yamlParser
 import io.circe.generic.auto.*
 
 object generator:
-    def extractYamlConfig(configYaml: os.Path, projectName: String= "new_project"): (ProjectDirs, ProjectFiles, Map[String, Any]) =
+    def extractYamlConfig(yamlSchema: os.Path, projectName: String= "new_project"): (ProjectDirs, ProjectFiles, Map[String, Any]) =
         val projectConfig = for
-            _       <- validator. checkFilesExist(Seq(configYaml))
-            content <- try Right(os.read(configYaml)) 
-                        catch case ex: Exception => Left(s"Failed reading $configYaml: ${ex.getMessage}")
+            _       <- validator. checkFilesExist(Seq(yamlSchema))
+            content <- try Right(os.read(yamlSchema)) 
+                        catch case ex: Exception => Left(s"Failed reading $yamlSchema: ${ex.getMessage}")
             json    <- yamlParser.parse(content)
-                        .left.map(err => s"YAML syntax error in $configYaml: ${err.getMessage}")
+                        .left.map(err => s"YAML syntax error in $yamlSchema: ${err.getMessage}")
             dirs    <- json.as[ProjectDirs]
-                        .left.map(err => s"Failed decoding 'dirs' in $configYaml: ${err.getMessage}")
+                        .left.map(err => s"Failed decoding 'dirs' in $yamlSchema: ${err.getMessage}")
             files   <- json.as[ProjectFiles]
-                        .left.map(err => s"Failed decoding 'files' in $configYaml: ${err.getMessage}")
+                        .left.map(err => s"Failed decoding 'files' in $yamlSchema: ${err.getMessage}")
         yield 
             val (filesPaths, filesNames) = files.files.map { fileSpec =>
                  // Construct filename 
