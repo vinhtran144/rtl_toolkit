@@ -1,0 +1,21 @@
+{{#eq file_type "port"}}
+/*
+ =============================================================================
+   PORT TASK BINDING EXAMPLE
+ =============================================================================
+    logic clk;
+    logic rst_n;
+
+    // PORT_TASKS:
+    // - start_clock
+    // - stop_clock
+    modport sink (input clk,input rst_n);
+
+
+    // PORT_TASKS:
+    // - measure_p
+    modport source (input clk,input rst_n);
+*/
+{{else}}
+
+{{/eq}}
