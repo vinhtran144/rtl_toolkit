@@ -11,6 +11,10 @@ files:
     output_dir: ""
     file_type: "if"
 
+  - template: "dependency.yaml.hbs"
+    output_dir: "src"
+    file_type: "NA"
+
   - template: "pkg.sv.hbs"
     output_dir: "src/rtl"
 

@@ -155,7 +155,11 @@ object generator:
             case Some(t) => s"_${t}"
             case None    => ""
 
-        // Prefix inputName
-        s"${inputName}${typeSeg}_${templateSeg}"
+        if typeSeg == "_NA" || typeSeg == "_N/A" then
+            // Ignore prefixes, for dependency.yaml config, or README.txt
+            templateSeg
+        else
+            // Prefix inputName
+            s"${inputName}${typeSeg}_${templateSeg}"
 
 

@@ -1,0 +1,8 @@
+dirs:
+  - "interfaces"
+  - "components"
+  - "testsuites"
+
+files:
+  - template: "README.txt.svh"
+  - file_type: "NA"
