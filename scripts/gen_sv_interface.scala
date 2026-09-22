@@ -11,6 +11,11 @@ import toolkitUtils.*
     
     val (dirsConfig, filesConfig, generateContext) = generator.extractYamlConfig(interfaceSchema,projectName)
 
+    // Inject project type into context so hbs can use
+    val genContextFull = generateContext ++ Map (
+        "project_type" -> "Interface"
+    )
+    
     generator.generateDirs(dirsConfig, targetDir, projectName)
-    generator.generateFiles(filesConfig, targetDir, projectName, generateContext)
+    generator.generateFiles(filesConfig, targetDir, projectName, genContextFull)
     

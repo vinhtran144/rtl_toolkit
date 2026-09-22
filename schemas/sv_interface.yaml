@@ -11,6 +11,10 @@ files:
     output_dir: ""
     file_type: "if"
 
+  - template: "README.md.hbs"
+    output_dir: ""
+    file_type: "NA"
+
   - template: "dependency.yaml.hbs"
     output_dir: "src"
     file_type: "NA"
