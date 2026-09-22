@@ -91,9 +91,9 @@ object generator:
         )
 
     
-    def generateDirs(dirsConfig: ProjectDirs, targetDir: os.Path): Unit =
+    def generateDirs(dirsConfig: ProjectDirs, targetDir: os.Path, projectName: String= "new_project"): Unit =
         for dir <- dirsConfig.dirs if dir.trim.nonEmpty do
-            val dirPath = targetDir / os.RelPath(dir)
+            val dirPath = targetDir / projectName / os.RelPath(dir)
             if os.exists(dirPath) then
                 println(s"Directory $dirPath already exists")
             else
@@ -115,7 +115,7 @@ object generator:
                 fileType     = fileSpec.file_type,
                 templateName = fileSpec.template
             )
-            val filePath = targetDir / os.RelPath(fileSpec.output_dir) / fileName
+            val filePath = targetDir / projectName / os.RelPath(fileSpec.output_dir) / fileName
             val templatePath = os.pwd / "templates" / fileSpec.template
 
             // Append file_type to render specific types
@@ -156,7 +156,7 @@ object generator:
             case None    => ""
 
         if typeSeg == "_NA" || typeSeg == "_N/A" then
-            // Ignore prefixes, for dependency.yaml config, or README.txt
+            // Ignore prefixes, for dependency.yaml config, README.md, etc
             templateSeg
         else
             // Prefix inputName

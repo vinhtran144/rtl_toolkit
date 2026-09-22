@@ -11,6 +11,6 @@ import toolkitUtils.*
     
     val (dirsConfig, filesConfig, generateContext) = generator.extractYamlConfig(interfaceSchema,projectName)
 
-    generator.generateDirs(dirsConfig, targetDir)
+    generator.generateDirs(dirsConfig, targetDir, projectName)
     generator.generateFiles(filesConfig, targetDir, projectName, generateContext)
     

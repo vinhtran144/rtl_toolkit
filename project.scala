@@ -5,5 +5,5 @@
 //> using dep io.circe::circe-yaml:1.15.0
 //> using dep io.circe::circe-parser:0.14.16
 //> using dep com.github.jknack:handlebars:4.5.5
-//> using dep org.slf4j:slf4j-nop:2.0.19
+//> using dep org.slf4j:slf4j-nop:2.0.20
 //> using file ./utils

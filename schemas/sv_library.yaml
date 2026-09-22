@@ -4,5 +4,5 @@ dirs:
   - "testsuites"
 
 files:
-  - template: "README.txt.svh"
+  - template: "README.md.svh"
   - file_type: "NA"
