@@ -56,9 +56,29 @@ object generator:
         
         // Get all files ends with .sv to be source files
         val sourceFiles = filesPaths
-            .filter(p => p.endsWith(".sv") || p.endsWith(".v")) // Get sources files
-            .distinct
+            .filter(p => p.endsWith(".sv") || p.endsWith(".v"))
+            .flatMap { path =>
+                // Constructing wildcards
+                val lastSlash = path.lastIndexOf('/')
+                val dotIdx    = path.lastIndexOf('.')
 
+                // Dir to the files
+                val dir = if (lastSlash >= 0 && dotIdx > lastSlash) 
+                        path.substring(0, lastSlash) 
+                    else ""
+                    
+                // Get extension ".sv"
+                val ext = path.substring(dotIdx) 
+                
+                // Form wildcard path
+                if ( "." != dir) then
+                    List(s"$dir/*$ext")
+                else 
+                    List(s"*$ext")
+                
+            
+            }
+            .distinct
         Map(
             "include_dirs" -> includeDirs,
             "source_files" -> sourceFiles            
