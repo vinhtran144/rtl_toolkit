@@ -27,7 +27,7 @@ object generator:
                 val fileName = constructFileName(  
                     inputName    = projectName.trim,
                     fileType     = fileSpec.file_type,
-                    templateName = fileSpec.template
+                    templateFile = fileSpec.template
                 )
                 val filePath = if (fileSpec.output_dir == "")  then 
                     s"./$fileName" 
@@ -113,7 +113,7 @@ object generator:
             val fileName = constructFileName(
                 inputName    = projectName.trim,
                 fileType     = fileSpec.file_type,
-                templateName = fileSpec.template
+                templateFile = fileSpec.template
             )
             val filePath = targetDir / projectName / os.RelPath(fileSpec.output_dir) / fileName
             val templatePath = os.pwd / "templates" / fileSpec.template
@@ -142,24 +142,44 @@ object generator:
     private def constructFileName(
       inputName: String,
       fileType: Option[String],
-      templateName: String
+      templateFile: String
     ): String =
         // Get name of template, trime .hbs extension
-        val templateSeg = if templateName.endsWith(".hbs") then
-            templateName.substring(0, templateName.length - 4)
+        val templateName = if templateFile.endsWith(".hbs") then
+            templateFile.substring(0, templateFile.length - 4)
         else
-            templateName
+            templateFile
 
         // Add file type segment if included
         val typeSeg = fileType.map(_.trim).filter(_.nonEmpty) match
-            case Some(t) => s"_${t}"
+            case Some(t) => s"${t}_"
             case None    => ""
 
-        if typeSeg == "_NA" || typeSeg == "_N/A" then
+        if typeSeg == "NA_" || typeSeg == "N/A_" then
             // Ignore prefixes, for dependency.yaml config, README.md, etc
-            templateSeg
+            templateName
         else
-            // Prefix inputName
-            s"${inputName}${typeSeg}_${templateSeg}"
+            val dotIdx = templateName.indexOf('.')
+            val (baseName, extension) = if (dotIdx != -1) then
+                // Separate template name and extension part
+                (templateName.substring(0, dotIdx), templateName.substring(dotIdx))
+            else
+                (templateName, "")
+
+            // check if template is for tb
+            val isTb = baseName.startsWith("tb_")
+            val templateSeg = if isTb then
+                baseName.stripPrefix("tb_")
+            else
+                baseName
+
+            // Return construct file name
+            if (isTb) then
+                s"tb_${typeSeg}${templateSeg}_${inputName}${extension}"
+            else
+                if (baseName == "pkg" || baseName == "top") then
+                    s"${inputName}_${typeSeg}${templateSeg}${extension}"
+                else
+                    s"${typeSeg}${templateSeg}_${inputName}${extension}"
 
 

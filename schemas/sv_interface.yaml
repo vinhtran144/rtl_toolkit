@@ -9,6 +9,7 @@ files:
 
   - template: "top.sv.hbs"
     output_dir: ""
+    file_type: "if"
 
   - template: "README.md.hbs"
     output_dir: ""
@@ -39,10 +40,10 @@ files:
     output_dir: "src/task"
     file_type: "monitor"
 
-  - template: "task_tb.sv.hbs"
+  - template: "tb_task.sv.hbs"
     output_dir: "tb"
     file_type: "driver"
 
-  - template: "task_tb.sv.hbs"
+  - template: "tb_task.sv.hbs"
     output_dir: "tb"
     file_type: "monitor"
