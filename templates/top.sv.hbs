@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 {{#if hasPkg}}import {{project_name}}_pkg::*;
 {{/if}}
-{{#eq file_type "if"}}
+{{#eq project_type "Interface"}}
 interface {{project_name}}_if #(`include "{{module_param}}")(`include "{{module_sign}}");
     {{#each logic_header}}`include "{{this}}"
     {{/each}}

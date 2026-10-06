@@ -68,18 +68,21 @@ object generator:
         // Check if there's package, supposed to be 1 singular, fixed <projectName>_pkg
         val hasPkg : Boolean = filesNames.filter(_.contains("_pkg")).nonEmpty
 
+        // Extract header files
+        val headerFiles = filesNames.filter(_.endsWith(".svh")) 
+
         // Extract single io_param and io_sig headers 
-        val paramHeader: String = filesNames
-            .find(_.contains("io_param.svh"))
+        val paramHeader: String = headerFiles
+            .find(_.contains("io_param"))
             .getOrElse("")
-        val sigHeader: String = filesNames
-            .find(_.contains("io_sig.svh"))
+        val sigHeader: String = headerFiles
+            .find(_.contains("io_sig"))
             .getOrElse("")
         
         // Get list of logic headers
-        val logicHeaders = filesNames.filter(_.contains("logic.svh"))
+        val logicHeaders = headerFiles.filter(_.contains("logic"))
         // Get list of task headers
-        val taskHeaders = filesNames.filter(_.contains("task.svh"))
+        val taskHeaders = headerFiles.filter(_.contains("task"))
 
         // Construct context for extractContext
         Map(

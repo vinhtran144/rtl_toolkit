@@ -9,7 +9,6 @@ files:
 
   - template: "top.sv.hbs"
     output_dir: ""
-    file_type: "if"
 
   - template: "README.md.hbs"
     output_dir: ""
