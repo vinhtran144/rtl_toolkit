@@ -16,6 +16,11 @@ import toolkitUtils.*
         "project_type" -> "Interface"
     )
     
-    generator.generateDirs(dirsConfig, targetDir, projectName)
-    generator.generateFiles(filesConfig, targetDir, projectName, genContextFull)
+    // Check if the new project already exist
+    val newProjectDir = targetDir / projectName
+    if !os.exists(newProjectDir) then
+        generator.generateDirs(dirsConfig, targetDir, projectName)
+        generator.generateFiles(filesConfig, targetDir, projectName, genContextFull)
+    else
+        println(s"Error: Another project already exist with that name (${projectName})")
     
