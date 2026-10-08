@@ -20,7 +20,7 @@ lib.add_source_files(
     ]{{#if include_dirs}},
     include_dirs=[
         {{#each include_dirs}}
-        Path("{{this}}").as_posix(){{#unless @last}}, {{/unless}}
+        Path("../{{this}}").as_posix(){{#unless @last}}, {{/unless}}
         {{/each}}
     ]
     {{/if}}

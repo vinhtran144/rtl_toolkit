@@ -2,14 +2,14 @@
 {{#if hasPkg}}import {{project_name}}_pkg::*;
 {{/if}}
 {{#eq project_type "Interface"}}
-interface {{project_name}}_if #(`include "{{module_param}}")(`include "{{module_sign}}");
+interface {{project_name}} #(`include "{{module_param}}")(`include "{{module_sign}}");
     {{#each logic_header}}`include "{{this}}"
     {{/each}}
 
     {{#each task_header}}`include "{{this}}"
     {{/each}}
 
-endinterface : {{project_name}}_if
+endinterface : {{project_name}}
 
 {{else}}
 module {{project_name}} #(`include "{{module_param}}")(`include "{{module_sign}}");
