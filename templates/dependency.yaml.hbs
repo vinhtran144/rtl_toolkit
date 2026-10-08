@@ -3,6 +3,10 @@ interfaces:
 #    lib:
 #    ver:
 
+{{#eq project_type "Interface"}}
+
+{{else}}
+{{!-- Unlikely for interface to depend on components or testsuites --}}
 components:
 #  - name:
 #    lib:
@@ -12,4 +16,5 @@ testsuites:
 #  - name:
 #    lib:
 #    ver:
+{{/eq}}
 

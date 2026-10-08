@@ -1,0 +1,40 @@
+project:
+    name: {{project_name}}
+    type: {{project_type}}
+    ver: 1.0.0
+
+parameters:                     # Keys here will appears in module's parameter field
+    #   THIS_DATA_WIDTH: 32
+    #   PARAM_KEY: param_value  # Can also be localparam defined in package
+
+nets:
+    logic:
+    #    - name:                # Name for this net 
+    #      bits:                # Bits width of this signal
+    #      bus_wd: 1            # Optional, will default to 1 if not specified
+    #      io:                  # Optional, appears as io of the module/interface if defined
+    #           port_name:      # Name of the IO port
+    #           direction:      # input | output | inout
+
+    interfaces:
+    #    - name:                # Name for this net
+    #      interface:           # Interface declared in dependencies.yaml
+    #      array_size: 1        # Optional will default to 1 if not specified
+    #      parameters:
+    #           DATA_WIDTH: DATA_WIDTH # Can pass value or parameter defined in param fields
+    #      io:                  # Optional, appears as io of the module/interface if defined
+    #           port_name:      # Name of the interface port
+    #           modport:        # modport of the interface
+
+instances:
+    #   - name:
+    #     components:           # Defined in dependencies.yaml
+    #     array_size:           # Optional, allowing generating array of instances
+    #     parameters:
+    #         PARAM_KEY: param_value
+    #     bindings:
+    #         - port_name:      # Name of the port
+    #           net:            # Name of the net to be connected
+    #           slice: "[x:y]"  # Optional, begin and end of the nets' index to be connected
+    #           # All instances in an array will connect to the same net if slice is not defined
+                
