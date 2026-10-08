@@ -1,9 +1,18 @@
 `timescale 1ns / 1ps
-module {{project_name}}_{{file_type}}_task_tb;
+`include "vunit_defines.svh"
+
+module tb_{{file_type}}_task_{{project_name}};
     {{project_name}} dut();
 
-    initial begin
+    `TEST_SUITE begin
+        `TEST_SUITE_SETUP begin
 
-        $stop
+        end
+
+        `TEST_CASE("{{file_type}}_task_{{project_name}}_init") begin
+            `CHECK_EQUAL(1,1);
+        end
     end
-endmodule : {{project_name}}_{{file_type}}_task_tb
+
+    `WATCHDOG(1000ns);
+endmodule : tb_{{file_type}}_task_{{project_name}}
