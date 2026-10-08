@@ -75,8 +75,6 @@ object generator:
                     List(s"$dir/*$ext")
                 else 
                     List(s"*$ext")
-                
-            
             }
             .distinct
         Map(
@@ -159,9 +157,9 @@ object generator:
                 os.write.over(filePath, renderedContent)
                 println(s"Successfully generated $filePath")
             
-    // Name constructed structure: <project_name>_<file_type>_<template>
+    // Name constructed structure: <file_type>_<template>_<project_name>_<extension>
     // Example project_name = mem_bus, file_type = monitor, template = task.svh.hbs
-    // returns: mem_bus_monitor_task.svh
+    // returns: monitor_task_mem_bus_.svh
     private def constructFileName(
       inputName: String,
       fileType: Option[String],

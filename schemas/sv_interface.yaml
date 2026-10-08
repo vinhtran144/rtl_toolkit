@@ -3,16 +3,22 @@ dirs:
   - "src/task"
   - "src/gen"
   - "tb"
+  - "sim"
 
 files:
-  - template: "filelist.f.hbs"
-    output_dir: ""
-
   - template: "top.sv.hbs"
     output_dir: ""
 
   - template: "README.md.hbs"
     output_dir: ""
+    file_type: "NA"
+
+  - template: ".gitignore.hbs"
+    output_dir: ""
+    file_type: "NA"
+
+  - template: "run.py.hbs"
+    output_dir: "sim"
     file_type: "NA"
 
   - template: "dependency.yaml.hbs"

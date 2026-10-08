@@ -1,0 +1,33 @@
+from pathlib import Path
+from vunit import VUnit
+
+# Suppress the deprecation warning
+VU = VUnit.from_argv(compile_builtins=False)
+
+# Add builtins
+VU.add_verilog_builtins()  
+
+# Create design library
+lib = VU.add_library("lib")
+
+SIM_DIR = Path(__file__).parent
+
+lib.add_source_files(
+    [
+        {{#each source_files}}
+        "../{{this}}"{{#unless @last}}, {{/unless}}
+        {{/each}}
+    ]{{#if include_dirs}},
+    include_dirs=[
+        {{#each include_dirs}}
+        Path("{{this}}").as_posix(){{#unless @last}}, {{/unless}}
+        {{/each}}
+    ]
+    {{/if}}
+)
+
+# Simulator options
+VU.set_sim_option("modelsim.vsim_flags", ["-t", "1ps"])
+
+# Run test suite
+VU.main()
