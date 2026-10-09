@@ -25,6 +25,10 @@ files:
     output_dir: "src"
     file_type: "NA"
 
+  - template: "manifest.yaml.hbs"
+    output_dir: "src"
+    file_type: "NA"
+
   - template: "pkg.sv.hbs"
     output_dir: "src/rtl"
 
