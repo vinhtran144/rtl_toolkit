@@ -1,11 +1,11 @@
 package toolkitUtils
 
 object validator:
-    def checkArgCount(args: Seq[String], minCount: Int, usageMsg: String): Either[String, Unit] =
+    def checkArgCount(args: Seq[String], minCount: Int, scriptName: String): Either[String, Unit] =
     if args.length >= minCount then
       Right(()) 
     else
-      Left(s"Insufficient arguments.\nUsage: $usageMsg")
+      Left(s"Insufficient arguments while excecuting $scriptName\n")
 
     def checkTargetDir(rawPath: String): Either[String, os.Path] =
         for 
@@ -72,9 +72,8 @@ object validator:
       args: Seq[String],
       scriptName: String
      ): (os.Path, String) =
-        val usageMsg   = s"scala run $scriptName -- <target_dir> <project_name>"
         val callCheck = for
-            _ <- checkArgCount(args, 2, usageMsg)
+            _ <- checkArgCount(args, 2, scriptName)
             targetDir <- checkTargetDir(args(0))
 
             projectName = args(1)
@@ -86,9 +85,8 @@ object validator:
       args: Seq[String],
       scriptName: String
      ): os.Path =
-        val usageMsg = s"scala run $scriptName -- <target_dir> "
         val callCheck = for
-            _ <- checkArgCount(args, 1, usageMsg)
+            _ <- checkArgCount(args, 1, scriptName)
             targetDir <- checkTargetDir(args(0))
         yield (targetDir)
         unwrapOrExit(callCheck)
