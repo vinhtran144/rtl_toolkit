@@ -36,10 +36,8 @@ object validator:
             println(s"Error: $error")
             sys.exit(1)
 
-    def checkSvTopDir(targetDir: os.Path): Either[String, os.Path] =
-        val topReg: List[String] = List("*_top.sv", "README.md", ".gitignore" )
-
-
+    def getTopDir(targetDir: os.Path, topReg: List[String] = List("README.md")): os.Path =
+        
         def isTopDir(dir: os.Path): Boolean =
 
             val filesInDir = os.list(dir).map(_.last)
@@ -62,14 +60,12 @@ object validator:
                 else 
                     loop(currentDir / os.up) // recurvive call
 
-        loop(targetDir).match
+        val result = loop(targetDir).match
             case Some(topDir) => Right(topDir)
             case None => Left("Could not find top directory")
-
-    def getSvTopDir (targetDir: os.Path): os.Path = 
-        unwrapOrExit(checkSvTopDir(targetDir))
-
         
+        unwrapOrExit(result)
+
     // For Checking a Target module and Name from input args
     // returns ONLY 1. Target path, 2. project name
     def validateDirAndName(

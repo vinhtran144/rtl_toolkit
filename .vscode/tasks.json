@@ -113,7 +113,7 @@
       "description" : "Select execute script to run:",
       "options" : [
         "dir_test",
-        "elaborate_sv"
+        "elab_sv_manifest"
       ]
     },
     {
