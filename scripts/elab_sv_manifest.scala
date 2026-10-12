@@ -40,4 +40,11 @@ case class ProjectParam(parameters: Option[Map[String, Json]] = None)
             Map("name" -> key, "value" -> valStr)
         }).toList
 
-    printf(s"$paramList")
+    val ioParamTemplate = os.pwd / "templates" / "io_param.svh.hbs"
+    val paramContext: Map[String, Any] = Map(
+        "manifestParam" -> paramList
+    )
+    println(paramContext)
+    val ioParamDir = topDir / "src" / "gen" / s"io_param_${config.project.name}.svh"
+    generator.generateFile(ioParamDir, ioParamTemplate, paramContext)
+

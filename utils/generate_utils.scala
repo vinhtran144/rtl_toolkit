@@ -146,6 +146,7 @@ object generator:
             )} else
                 context
 
+            // Generate the files
             generateFile(filePath,templatePath,fileContext)
           
 
@@ -156,6 +157,7 @@ object generator:
         else
             val templateRaw = os.read(templatePath)
             val renderedContent = HandlebarsRenderer.render(templateRaw, fileContext)
+            // println(s"Attempting to use template $templatePath at $targetDir")
             os.write.over(targetDir, renderedContent)
             println(s"Successfully generated $targetDir")
 
