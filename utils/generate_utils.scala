@@ -121,7 +121,7 @@ object generator:
                 os.makeDir.all(dirPath)
                 println(s"Created directory: $dirPath")
 
-    def generateFiles(filesConfig: ProjectFiles, targetDir: os.Path,
+    def generateProject(filesConfig: ProjectFiles, targetDir: os.Path,
         projectName: String= "new_project", 
         extraContext: Map[String, Any] = Map.empty): Unit =
         
@@ -145,18 +145,21 @@ object generator:
                 "file_type" -> fileSpec.file_type.get.toLowerCase
             )} else
                 context
-        
-            // target file check
-            if os.exists(filePath) then
-                println(s"File already exist, skipping $filePath")
-            else if !os.exists(templatePath) then
-                println(s"Warning: Template not found $templatePath, skip generation")
-            else 
-                val templateRaw = os.read(templatePath)
-                val renderedContent = HandlebarsRenderer.render(templateRaw, fileContext)
-                os.write.over(filePath, renderedContent)
-                println(s"Successfully generated $filePath")
-            
+
+            generateFile(filePath,templatePath,fileContext)
+          
+
+    def generateFile(targetDir: os.Path, templatePath: os.Path,
+                    fileContext: Map[String,Any] = Map.empty): Unit =
+        if !os.exists(templatePath) then
+            println(s"Warning: Template not found $templatePath, skip generation")
+        else
+            val templateRaw = os.read(templatePath)
+            val renderedContent = HandlebarsRenderer.render(templateRaw, fileContext)
+            os.write.over(targetDir, renderedContent)
+            println(s"Successfully generated $targetDir")
+
+    
     // Name constructed structure: <file_type>_<template>_<project_name>_<extension>
     // Example project_name = mem_bus, file_type = monitor, template = task.svh.hbs
     // returns: monitor_task_mem_bus_.svh

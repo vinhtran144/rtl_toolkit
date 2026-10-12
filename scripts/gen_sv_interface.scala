@@ -20,7 +20,7 @@ import toolkitUtils.*
     val newProjectDir = targetDir / projectName
     if !os.exists(newProjectDir) then
         generator.generateDirs(dirsConfig, targetDir, projectName)
-        generator.generateFiles(filesConfig, targetDir, projectName, genContextFull)
+        generator.generateProject(filesConfig, targetDir, projectName, genContextFull)
     else
         println(s"Error: Another project already exist with that name (${projectName})")
     
