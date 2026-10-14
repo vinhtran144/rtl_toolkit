@@ -6,7 +6,8 @@ import io.circe.Json
 
 case class ProjectConfig(project: ProjectDetail)
 case class ProjectDetail(name: String, `type`: String, ver: String)
-case class ProjectParam(parameters: Option[Map[String, Json]] = None)
+case class ProjectParam(parameters: Option[List[ParamDef]] = None)
+case class ParamDef(name: String, value: Json, data_t: Option[String] = None)
 
 @main def elabSvManifest (args: String*): Unit =
     val currentScriptName = "elaborate_sv.scala"   // Validate script calls
@@ -32,19 +33,24 @@ case class ProjectParam(parameters: Option[Map[String, Json]] = None)
 
     val (config,param) = validator.unwrapOrExit(projectData)
 
-    // Extract key and value into field, later to use as context for hbs
-    val paramList: List[Map[String, String]] = param.parameters  // unpack Option
-        .getOrElse(Map.empty)       // For None case
-        .map({ (key, jsonVal) =>
-            val valStr = jsonVal.asString.getOrElse(jsonVal.noSpaces) // parse Json
-            Map("name" -> key, "value" -> valStr)
-        }).toList
+    val paramList : List[Map[String, String]] = param.parameters // Unpack Option
+        .getOrElse(List.empty)      // For None case, i.e parameters left plank
+        .map({paramDef =>     // Iterates through each ParamDef object
+
+            val paramVal = paramDef.value.asString.getOrElse(paramDef.value.noSpaces)
+            // Assemble context
+            Map(
+            "name"      -> paramDef.name,
+            "value"     -> paramVal,
+            "data_t"    -> paramDef.data_t.getOrElse("")
+            )
+        })
+        .toList
 
     val ioParamTemplate = os.pwd / "templates" / "io_param.svh.hbs"
     val paramContext: Map[String, Any] = Map(
         "manifestParam" -> paramList
     )
-    println(paramContext)
     val ioParamDir = topDir / "src" / "gen" / s"io_param_${config.project.name}.svh"
     generator.generateFile(ioParamDir, ioParamTemplate, paramContext)
 
