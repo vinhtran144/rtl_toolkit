@@ -2,6 +2,8 @@ import toolkitUtils.*
 
 import io.circe.yaml.parser as yamlParser
 import io.circe.generic.auto.*
+import io.circe.generic.auto._
+import io.circe.syntax._
 import io.circe.Json
 import cats.data.Op
 
@@ -11,7 +13,7 @@ case class ProjectParam(parameters: Option[List[ParamDef]] = None)
 case class ParamDef(name: String, value: Json, data_t: Option[String] = None)
 
 case class LogicIo(port_name: String, direction: String)
-case class LogicNet(name: String, bits: Json, bus_wd: Option[Json] = None, 
+case class LogicNet(name: String, bits: Option[Json], bus_wd: Option[Json] = None, 
     io: Option[LogicIo] = None)
 case class InterfaceIo(port_name: String, modport: String)
 case class InterfaceNet(name: String, interface: String, array_size: Option[Json] = None,
@@ -19,7 +21,7 @@ case class InterfaceNet(name: String, interface: String, array_size: Option[Json
 
 case class NetsList(logic: Option[List[LogicNet]] = None, 
     interfaces: Option[List[InterfaceNet]] = None)
-case class ProjectNets(nets: Option[NetsList] = None)
+case class ProjectNets(nets: NetsList)
 
 case class InstBind(port_name: String, net: String, slice: Option[String] = None)
 case class InstsDef(name: String, components: String, array_size: Option[Json] = None,
@@ -46,27 +48,47 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
                     .left.map(err => s"Failed decoding 'project' in $manifestYaml: ${err.getMessage}")
         param   <- json.as[ProjectParam]
                     .left.map(err => s"Failed decoding 'parameters' in $manifestYaml: ${err.getMessage}")
-    yield (config,param)
 
-    val (config,param) = validator.unwrapOrExit(projectData)
+        // Circle seems to have trouble with nested data, so manually shift hcursor
+        nets    <- json.hcursor.downField("nets").as[NetsList]
+              .left.map(err => s"Failed decoding 'nets' in $manifestYaml: ${err.getMessage}")
+    yield (config,param,nets)
+
+    val (config,param,nets) = validator.unwrapOrExit(projectData)
 
     val paramList : List[Map[String, String]] = param.parameters // Unpack Option
         .getOrElse(List.empty)      // For None case, i.e parameters left plank
         .map({paramDef =>     // Iterates through each ParamDef object
 
-            val paramVal = paramDef.value.asString.getOrElse(paramDef.value.noSpaces)
             // Assemble context
             Map(
             "name"      -> paramDef.name,
-            "value"     -> paramVal,
+            "value"     -> paramDef.value.asString.getOrElse(paramDef.value.noSpaces),
             "data_t"    -> paramDef.data_t.getOrElse("")
             )
         })
+        
+    val logicNets : List[Map[String, Any]] = nets.logic.getOrElse(List.empty).map({
+        logicNet =>
+            // println(s"${}")
+            println(s"${logicNet.io.map(_.port_name).getOrElse("")}")
+            Map(
+                "name"      -> logicNet.name,
+                "bits"      -> logicNet.bits.map({value => value.asString.getOrElse(value.noSpaces)}).getOrElse("1"),
+                "bus_wd"    -> logicNet.bus_wd.map({value => value.asString.getOrElse(value.noSpaces)}).getOrElse("1"),
+                "is_io"     -> logicNet.io.isDefined,
+                "io_name"   -> logicNet.io.map(_.port_name).getOrElse(""),
+                "io_dir"    -> logicNet.io.map(_.direction).getOrElse("")
+            )
+    })
 
     val ioParamTemplate = os.pwd / "templates" / "io_param.svh.hbs"
-    val paramContext: Map[String, Any] = Map(
-        "manifestParam" -> paramList
+    val manifestContext: Map[String, Any] = Map(
+        "manifestParam"     -> paramList,
+        "manifestLogicNet"  -> logicNets,
+        "manifestLogicIO"   -> logicNets.filter(logicNet => logicNet("is_io") == true)
     )
     val ioParamDir = topDir / "src" / "gen" / s"io_param_${config.project.name}.svh"
-    generator.generateFile(ioParamDir, ioParamTemplate, paramContext)
-
+    generator.generateFile(ioParamDir, ioParamTemplate, manifestContext)
+    
+    println(s"$manifestContext")
