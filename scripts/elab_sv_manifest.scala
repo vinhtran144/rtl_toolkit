@@ -70,23 +70,44 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
         
     val logicNets : List[Map[String, Any]] = nets.logic.getOrElse(List.empty).map({
         logicNet =>
-            // println(s"${}")
-            println(s"${logicNet.io.map(_.port_name).getOrElse("")}")
             Map(
                 "name"      -> logicNet.name,
-                "bits"      -> logicNet.bits.map({value => value.asString.getOrElse(value.noSpaces)}).getOrElse("1"),
-                "bus_wd"    -> logicNet.bus_wd.map({value => value.asString.getOrElse(value.noSpaces)}).getOrElse("1"),
+                "bits"      -> logicNet.bits.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
+                "bus_wd"    -> logicNet.bus_wd.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
                 "is_io"     -> logicNet.io.isDefined,
-                "io_name"   -> logicNet.io.map(_.port_name).getOrElse(""),
-                "io_dir"    -> logicNet.io.map(_.direction).getOrElse("")
+                "io_name"   -> logicNet.io.fold("")(_.port_name),
+                "io_dir"    -> logicNet.io.fold("")(_.direction)
             )
+    })
+
+    val interfaceNets: List[Map[String, Any]] = nets.interfaces.getOrElse(List.empty).map({
+        interfaceNet =>
+            // Map parameters into list of map
+            val ifParamList : List[Map[String, String]] = interfaceNet.parameters.getOrElse(List.empty)
+                .map({
+                    paramDef => Map(
+                        "name"      -> paramDef.name,
+                        "value"     -> paramDef.value.asString.getOrElse(paramDef.value.noSpaces)
+                    )
+                })
+            Map(
+                "name"      -> interfaceNet.name,
+                "arr_size"  -> interfaceNet.array_size.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
+                "param"     -> ifParamList,  //List
+                "is_io"     -> interfaceNet.io.isDefined,
+                "io_name"   -> interfaceNet.io.fold("")(_.port_name),
+                "io_modport"-> interfaceNet.io.fold("")(_.modport)
+            )
+        
     })
 
     val ioParamTemplate = os.pwd / "templates" / "io_param.svh.hbs"
     val manifestContext: Map[String, Any] = Map(
         "manifestParam"     -> paramList,
         "manifestLogicNet"  -> logicNets,
-        "manifestLogicIO"   -> logicNets.filter(logicNet => logicNet("is_io") == true)
+        "manifestLogicIO"   -> logicNets.filter(net => net("is_io") == true),
+        "manifestIFNet"     -> interfaceNets,
+        "manifestIFIO"      -> interfaceNets.filter(net => net("is_io") == true)
     )
     val ioParamDir = topDir / "src" / "gen" / s"io_param_${config.project.name}.svh"
     generator.generateFile(ioParamDir, ioParamTemplate, manifestContext)
