@@ -92,6 +92,7 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
                 })
             Map(
                 "name"      -> interfaceNet.name,
+                "interface" -> interfaceNet.interface,
                 "arr_size"  -> interfaceNet.array_size.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
                 "param"     -> ifParamList,  //List
                 "is_io"     -> interfaceNet.io.isDefined,
@@ -118,4 +119,3 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
     generator.generateFile(ioParamDir, ioParamTemplate, manifestContext)
     generator.generateFile(ioSigDir, ioSigTemplate, manifestContext)
     
-    println(s"$manifestContext")
