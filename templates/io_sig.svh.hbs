@@ -1,9 +1,8 @@
-/*
- =============================================================================
-    SIGNAL EXAMPLE
-  =============================================================================
-    syscon_if.sink syscon,
-
-    input  logic [DATA_WIDTH-1:0] data_in,
-    output logic [DATA_WIDTH-1:0] data_out
-*/
+# =============================================================================
+#                            AUTO-GENERATED FILE
+# This file was generated automatically from the project manifest.
+# =============================================================================
+  {{#each manifestLogicIO}}
+      {{io_dir}} logic{{#unless (eq bits "1")}} [{{bits}}-1:0]{{/unless}} {{io_name}}{{#unless (eq bus_wd "1")}} [0:{{bus_wd}}-1] {{/unless}}{{#unless @last}},{{/unless}}{{#if @last}}{{#if ../manifestIFIO}},{{/if}}{{/if}}{{/each}}
+  {{#each manifestIFIO}}
+      {{name}}.{{io_modport}} {{io_name}}{{#unless (eq arr_size "1")}}[0:{{arr_size}}-1] {{/unless}}{{#unless @last}},{{/unless}}{{/each}}

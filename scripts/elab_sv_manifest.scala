@@ -101,7 +101,6 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
         
     })
 
-    val ioParamTemplate = os.pwd / "templates" / "io_param.svh.hbs"
     val manifestContext: Map[String, Any] = Map(
         "manifestParam"     -> paramList,
         "manifestLogicNet"  -> logicNets,
@@ -109,7 +108,14 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
         "manifestIFNet"     -> interfaceNets,
         "manifestIFIO"      -> interfaceNets.filter(net => net("is_io") == true)
     )
+
+    val ioParamTemplate = os.pwd / "templates" / "io_param.svh.hbs"
+    val ioSigTemplate = os.pwd / "templates" / "io_sig.svh.hbs"
+
     val ioParamDir = topDir / "src" / "gen" / s"io_param_${config.project.name}.svh"
+    val ioSigDir = topDir / "src" / "gen" / s"io_sig_${config.project.name}.svh"
+
     generator.generateFile(ioParamDir, ioParamTemplate, manifestContext)
+    generator.generateFile(ioSigDir, ioSigTemplate, manifestContext)
     
     println(s"$manifestContext")
