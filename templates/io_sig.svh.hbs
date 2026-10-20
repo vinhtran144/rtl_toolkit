@@ -12,6 +12,6 @@
   {{/each}}
   {{~#each manifestIFIO~}}
       {{interface}}.{{io_modport}} {{io_name}}
-      {{~#unless (eq arr_size "1")}} [0:{{arr_size}}-1]{{/unless}}
+      {{~#unless (eq array_size "1")}} [0:{{array_size}}-1]{{/unless}}
       {{~#unless @last}},{{/unless}}
   {{/each}}

@@ -12,20 +12,21 @@ case class ProjectDetail(name: String, `type`: String, ver: String)
 case class ProjectParam(parameters: Option[List[ParamDef]] = None)
 case class ParamDef(name: String, value: Json, data_t: Option[String] = None)
 
-case class LogicIo(port_name: String, direction: String)
-case class LogicNet(name: String, bits: Option[Json], bus_wd: Option[Json] = None, 
-    io: Option[LogicIo] = None)
-case class InterfaceIo(port_name: String, modport: String)
-case class InterfaceNet(name: String, interface: String, array_size: Option[Json] = None,
-    parameters: Option[List[ParamDef]] = None, io: Option[InterfaceIo] = None)
+case class IOLogic(ext_port: String, direction: String)
+case class IOIF(ext_port: String, modport: String)
+case class BindDef(port_name: String, net: String, modport: Option[String] = None, slice: Option[String] = None)
+
+case class LogicNet(net_name: String, bits: Option[Json], bus_wd: Option[Json] = None, 
+     io: Option[IOLogic] = None)
+case class InterfaceNet(net_name: String, interface: String, array_size: Option[Json] = None,
+    parameters: Option[List[ParamDef]] = None, bindings: Option[List[BindDef]] = None,
+    io: Option[IOIF] = None)
 
 case class NetsList(logic: Option[List[LogicNet]] = None, 
-    interfaces: Option[List[InterfaceNet]] = None)
-case class ProjectNets(nets: NetsList)
+    interface: Option[List[InterfaceNet]] = None)
 
-case class InstBind(port_name: String, net: String, slice: Option[String] = None)
 case class InstsDef(name: String, components: String, array_size: Option[Json] = None,
-    parameters: Option[List[ParamDef]] = None, binding: Option[List[InstBind]] = None)
+    parameters: Option[List[ParamDef]] = None, bindings: Option[List[BindDef]] = None)
 case class ProjectInsts(instances: Option[List[InstsDef]] = None)
 
 @main def elabSvManifest (args: String*): Unit =
@@ -71,16 +72,16 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
     val logicNets : List[Map[String, Any]] = nets.logic.getOrElse(List.empty).map({
         logicNet =>
             Map(
-                "name"      -> logicNet.name,
+                "net_name"  -> logicNet.net_name,
                 "bits"      -> logicNet.bits.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
                 "bus_wd"    -> logicNet.bus_wd.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
                 "is_io"     -> logicNet.io.isDefined,
-                "io_name"   -> logicNet.io.fold("")(_.port_name),
+                "io_name"   -> logicNet.io.fold("")(_.ext_port),
                 "io_dir"    -> logicNet.io.fold("")(_.direction)
             )
     })
 
-    val interfaceNets: List[Map[String, Any]] = nets.interfaces.getOrElse(List.empty).map({
+    val interfaceNets: List[Map[String, Any]] = nets.interface.getOrElse(List.empty).map({
         interfaceNet =>
             // Map parameters into list of map
             val ifParamList : List[Map[String, String]] = interfaceNet.parameters.getOrElse(List.empty)
@@ -91,12 +92,12 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
                     )
                 })
             Map(
-                "name"      -> interfaceNet.name,
+                "net_name"  -> interfaceNet.net_name,
                 "interface" -> interfaceNet.interface,
-                "arr_size"  -> interfaceNet.array_size.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
+                "array_size"-> interfaceNet.array_size.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
                 "param"     -> ifParamList,  //List
                 "is_io"     -> interfaceNet.io.isDefined,
-                "io_name"   -> interfaceNet.io.fold("")(_.port_name),
+                "io_name"   -> interfaceNet.io.fold("")(_.ext_port),
                 "io_modport"-> interfaceNet.io.fold("")(_.modport)
             )
         

@@ -3,44 +3,40 @@ project:
     type: {{project_type}}
     ver: 1.0.0
 
-parameters:                     # Keys here will appears in module's parameter field
-    # - name: DATA_WIDTH
-    #   value:  32
-    #   data_t: int
-    # - name: PARAM_KEY
-    #   value:  pkg_value    # localparam defined in package
-    #   data_t: real         
-
+parameters: [                    # Keys here will appears in module's parameter field
+    #   {name: DATA_WIDTH, value:  32, data_t: int},
+    #   {name: PARAM_KEY, value:  pkg_value, data_t: real} # localparam defined in package    
+]
 nets:
     logic:
-    #    - name:                # Name for this net 
+    #    - net_name:            # Name for this net 
     #      bits:                # Bits width of this signal
     #      bus_wd: 1            # Optional, will default to 1 if not specified
     #      io:                  # Optional, appears as io of the module/interface if defined
-    #           port_name:      # Name of the IO port
+    #           ext_port:       # Name of the IO port
     #           direction:      # input | output | inout
 
-    interfaces:
-    #    - name:                # Name for this net
-    #      interface:           # Interface declared in dependencies.yaml
+    interface:
+    #    - net_name:            # Name for this net
+    #      interface:           # Defined in dependencies.yaml
     #      array_size: 1        # Optional will default to 1 if not specified
-    #      parameters:                  # Note: no data_t as it's defined within the interface
-    #           - name: DATA_WIDTH
-    #             value:  DATA_WIDTH    # i.e: 32, as defined in parameters for the components
+    #      parameters: [                                   # Note: no data_t as it's defined within the interface
+    #           {name: DATA_WIDTH, value:  DATA_WIDTH}    # i.e: 32, as defined in parameters for the components
+    #      ]
+    #      bindings: [          # nets bind into this interface
+    #           {port_name: ,net: }  
+    #      ]                    # Fields: port_name, net, modport, slice
     #      io:                  # Optional, appears as io of the module/interface if defined
-    #           port_name:      # Name of the interface port
+    #           ext_port:       # Name of the interface port
     #           modport:        # modport of the interface
 
 instances:
-    #   - name:
+    #   - inst_name:
     #     components:           # Defined in dependencies.yaml
     #     array_size:           # Optional, allowing generating array of instances
-    #     parameters:                    # Note: no data_t as it's defined within the instances
-    #           - name: DATA_WIDTH
-    #             value:  DATA_WIDTH    # i.e: 32, as defined in parameters for the components
-    #     bindings:
-    #         - port_name:      # Name of the port
-    #           net:            # Name of the net to be connected
-    #           slice: "[x:y]"  # Optional, begin and end of the nets' index to be connected
-    #           # All instances in an array will connect to the same net if slice is not defined
-                # Dev note: should throw error if size doesn't match
+    #     parameters: [                                   # Note: no data_t as it's defined within the interface
+    #           {name: DATA_WIDTH, value:  DATA_WIDTH}    # i.e: 32, as defined in parameters for the components
+    #      ]
+    #     bindings: [
+    #           {port_name: ,net: }              # Slice appends to the connection
+    #      ]                    # Fields: port_name, net, modport, slice
