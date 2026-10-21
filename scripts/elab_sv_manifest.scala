@@ -14,7 +14,9 @@ case class ParamDef(name: String, value: Json, data_t: Option[String] = None)
 
 case class IOLogic(ext_port: String, direction: String)
 case class IOIF(ext_port: String, modport: String)
-case class BindDef(port_name: String, net: String, modport: Option[String] = None, slice: Option[String] = None)
+case class BindDef(port_name: String, net: String, 
+    index: Option[String] = None, slice: Option[String] = None, invert: Option[Boolean] = None, 
+    modport: Option[String] = None, signal: Option[String] = None)
 
 case class LogicNet(net_name: String, bits: Option[Json], bus_wd: Option[Json] = None, 
      io: Option[IOLogic] = None)
@@ -92,13 +94,16 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
                         "value"     -> paramDef.value.asString.getOrElse(paramDef.value.noSpaces)
                     )
                 })
-            val ifBindingList: List[Map[String, String]] = interfaceNet.bindings.getOrElse(List.empty)
+            val ifBindingList: List[Map[String, Any]] = interfaceNet.bindings.getOrElse(List.empty)
                 .map({
                     bindDef => Map(
                         "port_name" -> bindDef.port_name,
                         "net"       -> bindDef.net,
+                        "invert"    -> bindDef.invert.getOrElse(false),
+                        "index"     -> bindDef.index.getOrElse(""),
+                        "slice"     -> bindDef.slice.getOrElse(""),
                         "modport"   -> bindDef.modport.getOrElse(""),
-                        "slice"     -> bindDef.slice.getOrElse("")
+                        "signal"    -> bindDef.signal.getOrElse("")
                     )
                 }) 
             Map(
@@ -124,13 +129,16 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
                         "value"     -> paramDef.value.asString.getOrElse(paramDef.value.noSpaces)
                     )
                 })
-            val instBindingList: List[Map[String, String]] = instDef.bindings.getOrElse(List.empty)
+            val instBindingList: List[Map[String, Any]] = instDef.bindings.getOrElse(List.empty)
                 .map({
                     bindDef => Map(
                         "port_name" -> bindDef.port_name,
                         "net"       -> bindDef.net,
+                        "invert"    -> bindDef.invert.getOrElse(false),
+                        "index"     -> bindDef.index.getOrElse(""),
+                        "slice"     -> bindDef.slice.getOrElse(""),
                         "modport"   -> bindDef.modport.getOrElse(""),
-                        "slice"     -> bindDef.slice.getOrElse("")
+                        "signal"    -> bindDef.signal.getOrElse("")
                     )
                 }) 
             Map(
@@ -148,15 +156,18 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
         "manifestLogicNet"  -> logicNets,
         "manifestLogicIO"   -> logicNets.filter(net => net("is_io") == true),
         "manifestIFNet"     -> interfaceNets,
-        "manifestIFIO"      -> interfaceNets.filter(net => net("is_io") == true)
+        "manifestIFIO"      -> interfaceNets.filter(net => net("is_io") == true),
+        "manifestInsts"     -> instanceList
     )
 
     val ioParamTemplate = os.pwd / "templates" / "io_param.svh.hbs"
     val ioSigTemplate = os.pwd / "templates" / "io_sig.svh.hbs"
+    val netsTemplate = os.pwd / "templates" / "nets.svh.hbs"
 
     val ioParamDir = topDir / "src" / "gen" / s"io_param_${config.project.name}.svh"
     val ioSigDir = topDir / "src" / "gen" / s"io_sig_${config.project.name}.svh"
+    val netsDir = topDir / "src" / "gen" / s"nets_${config.project.name}.svh"
 
     generator.generateFile(ioParamDir, ioParamTemplate, manifestContext)
     generator.generateFile(ioSigDir, ioSigTemplate, manifestContext)
-    
+    generator.generateFile(netsDir, netsTemplate, manifestContext)
