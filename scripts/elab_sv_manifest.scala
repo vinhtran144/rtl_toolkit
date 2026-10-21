@@ -25,7 +25,7 @@ case class InterfaceNet(net_name: String, interface: String, array_size: Option[
 case class NetsList(logic: Option[List[LogicNet]] = None, 
     interface: Option[List[InterfaceNet]] = None)
 
-case class InstsDef(name: String, components: String, array_size: Option[Json] = None,
+case class InstsDef(inst_name: String, components: String, array_size: Option[Json] = None,
     parameters: Option[List[ParamDef]] = None, bindings: Option[List[BindDef]] = None)
 case class ProjectInsts(instances: Option[List[InstsDef]] = None)
 
@@ -49,13 +49,14 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
                     .left.map(err => s"Failed decoding 'project' in $manifestYaml: ${err.getMessage}")
         param   <- json.as[ProjectParam]
                     .left.map(err => s"Failed decoding 'parameters' in $manifestYaml: ${err.getMessage}")
-
+        inst    <- json.as[ProjectInsts]
+                    .left.map(err => s"Failed decoding 'instances' in $manifestYaml: ${err.getMessage}")
         // Circle seems to have trouble with nested data, so manually shift hcursor
         nets    <- json.hcursor.downField("nets").as[NetsList]
               .left.map(err => s"Failed decoding 'nets' in $manifestYaml: ${err.getMessage}")
-    yield (config,param,nets)
+    yield (config,param,inst,nets)
 
-    val (config,param,nets) = validator.unwrapOrExit(projectData)
+    val (config,param,inst,nets) = validator.unwrapOrExit(projectData)
 
     val paramList : List[Map[String, String]] = param.parameters // Unpack Option
         .getOrElse(List.empty)      // For None case, i.e parameters left plank
@@ -91,14 +92,53 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
                         "value"     -> paramDef.value.asString.getOrElse(paramDef.value.noSpaces)
                     )
                 })
+            val ifBindingList: List[Map[String, String]] = interfaceNet.bindings.getOrElse(List.empty)
+                .map({
+                    bindDef => Map(
+                        "port_name" -> bindDef.port_name,
+                        "net"       -> bindDef.net,
+                        "modport"   -> bindDef.modport.getOrElse(""),
+                        "slice"     -> bindDef.slice.getOrElse("")
+                    )
+                }) 
             Map(
                 "net_name"  -> interfaceNet.net_name,
                 "interface" -> interfaceNet.interface,
                 "array_size"-> interfaceNet.array_size.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
                 "param"     -> ifParamList,  //List
+                "bindings"  -> ifBindingList,
                 "is_io"     -> interfaceNet.io.isDefined,
                 "io_name"   -> interfaceNet.io.fold("")(_.ext_port),
                 "io_modport"-> interfaceNet.io.fold("")(_.modport)
+            )
+        
+    })
+
+    val instanceList: List[Map[String, Any]] = inst.instances.getOrElse(List.empty).map({
+        instDef =>
+            // Map parameters into list of map
+            val instParamList : List[Map[String, String]] = instDef.parameters.getOrElse(List.empty)
+                .map({
+                    paramDef => Map(
+                        "name"      -> paramDef.name,
+                        "value"     -> paramDef.value.asString.getOrElse(paramDef.value.noSpaces)
+                    )
+                })
+            val instBindingList: List[Map[String, String]] = instDef.bindings.getOrElse(List.empty)
+                .map({
+                    bindDef => Map(
+                        "port_name" -> bindDef.port_name,
+                        "net"       -> bindDef.net,
+                        "modport"   -> bindDef.modport.getOrElse(""),
+                        "slice"     -> bindDef.slice.getOrElse("")
+                    )
+                }) 
+            Map(
+                "inst_name" -> instDef.inst_name,
+                "components"-> instDef.components,
+                "array_size"-> instDef.array_size.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
+                "param"     -> instParamList,  //List
+                "bindings"  -> instBindingList,
             )
         
     })
