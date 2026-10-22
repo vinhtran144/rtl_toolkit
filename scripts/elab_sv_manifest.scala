@@ -27,6 +27,12 @@ case class InterfaceNet(net_name: String, interface: String, array_size: Option[
 case class NetsList(logic: Option[List[LogicNet]] = None, 
     interface: Option[List[InterfaceNet]] = None)
 
+case class SignalDef(direction: String, net: String)
+case class ModportDef(mod_name: String, signals: Option[List[SignalDef]] = None,
+    tasks: Option[List[String]] = None)
+
+case class InterfaceModport(modport: Option[List[ModportDef]])
+
 case class InstsDef(inst_name: String, components: String, array_size: Option[Json] = None,
     parameters: Option[List[ParamDef]] = None, bindings: Option[List[BindDef]] = None)
 case class ProjectInsts(instances: Option[List[InstsDef]] = None)
@@ -55,10 +61,12 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
                     .left.map(err => s"Failed decoding 'instances' in $manifestYaml: ${err.getMessage}")
         // Circle seems to have trouble with nested data, so manually shift hcursor
         nets    <- json.hcursor.downField("nets").as[NetsList]
-              .left.map(err => s"Failed decoding 'nets' in $manifestYaml: ${err.getMessage}")
-    yield (config,param,inst,nets)
+                    .left.map(err => s"Failed decoding 'nets' in $manifestYaml: ${err.getMessage}")
+        modports <- json.as[InterfaceModport]
+                    .left.map(err => s"Failed decoding 'modports' in $manifestYaml: ${err.getMessage}")
+    yield (config,param,inst,nets,modports)
 
-    val (config,param,inst,nets) = validator.unwrapOrExit(projectData)
+    val (config,param,inst,nets,modports) = validator.unwrapOrExit(projectData)
 
     val paramList : List[Map[String, String]] = param.parameters // Unpack Option
         .getOrElse(List.empty)      // For None case, i.e parameters left plank
@@ -171,3 +179,23 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
     generator.generateFile(ioParamDir, ioParamTemplate, manifestContext)
     generator.generateFile(ioSigDir, ioSigTemplate, manifestContext)
     generator.generateFile(netsDir, netsTemplate, manifestContext)
+
+    // Checking for interface project to generate modport
+    config.project.`type` match {
+        case "Interface" =>
+            val modportList: List [Map[String,Any]] = modports.modport.getOrElse(List.empty).map({
+                modportDef =>   
+                Map(
+                    "mod_name"  -> modportDef.mod_name,
+                    "signals"   -> modportDef.signals.getOrElse(List.empty).map({signalDef => 
+                                    Map(
+                                        "direction" -> signalDef.direction,
+                                        "net"       -> signalDef.net
+                                    )}),
+                    "tasks"     -> modportDef.tasks.getOrElse(List.empty).map({task =>
+                                    Map( "name"-> task )
+                                })
+                )
+            })
+        case other =>
+}

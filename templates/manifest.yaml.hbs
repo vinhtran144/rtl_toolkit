@@ -7,6 +7,16 @@ parameters: [                    # Keys here will appears in module's parameter 
     #   {name: DATA_WIDTH, value:  32, data_t: int},
     #   {name: PARAM_KEY, value:  pkg_value, data_t: real} # localparam defined in package    
 ]
+{{#eq project_type "Interface"}}
+modport: [                          # Listing the modport of this interface
+#   - mod_name:
+#     signals: [
+#           {direction: , net:}     # Lists out each net and its direction for this modport
+#     ] 
+#     tasks: []                     # List out all the imported tasks for this interface
+]
+{{/eq}}
+
 nets:
     logic:
     #    - net_name:            # Name for this net 
