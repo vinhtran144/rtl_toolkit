@@ -1,0 +1,18 @@
+# =============================================================================
+#                            AUTO-GENERATED FILE
+# This file was generated automatically from the project manifest.
+# =============================================================================
+{{#each manifestInsts~}}
+{{#if (eq array_size "1")}}
+    {{components}}
+    {{~#each param}} #(.{{name}}({{value}})){{/each}} {{inst_name}}(
+    {{~#each bindings}}
+        .{{port_name}}({{#if invert}}~{{/if}}
+        {{~net}}{{index}}{{slice}}{{#if modport}}.{{modport}}
+        {{~#if signal}}.{{signal}}{{/if}}{{/if}})
+        {{~#unless @last}},{{/unless}}
+    {{~/each}}
+    );
+{{!-- {{#else}} --}}
+{{/if}}
+{{/each}}
