@@ -58,6 +58,9 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
     val topDir = validator.getTopDir(targetDir,topReg)
     val manifestYaml = topDir / "src" / "manifest.yaml"
 
+    val templateDir = os.pwd / "templates"
+    val genDes = topDir / "src" / "gen"
+
     val projectData = for
         _       <- validator. checkFilesExist(Seq(manifestYaml))
         content <- try Right(os.read(manifestYaml)) 
@@ -179,13 +182,13 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
         "manifestInsts"     -> instanceList
     )
 
-    val ioParamTemplate = os.pwd / "templates" / "io_param.svh.hbs"
-    val ioSigTemplate = os.pwd / "templates" / "io_sig.svh.hbs"
-    val netsTemplate = os.pwd / "templates" / "nets.svh.hbs"
+    val ioParamTemplate = templateDir / "io_param.svh.hbs"
+    val ioSigTemplate = templateDir / "io_sig.svh.hbs"
+    val netsTemplate = templateDir / "nets.svh.hbs"
 
-    val ioParamDir = topDir / "src" / "gen" / s"io_param_${config.project.name}.svh"
-    val ioSigDir = topDir / "src" / "gen" / s"io_sig_${config.project.name}.svh"
-    val netsDir = topDir / "src" / "gen" / s"nets_${config.project.name}.svh"
+    val ioParamDir = genDes / s"io_param_${config.project.name}.svh"
+    val ioSigDir = genDes / s"io_sig_${config.project.name}.svh"
+    val netsDir = genDes / s"nets_${config.project.name}.svh"
 
     generator.generateFile(ioParamDir, ioParamTemplate, manifestContext)
     generator.generateFile(ioSigDir, ioSigTemplate, manifestContext)
@@ -216,5 +219,11 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
                                 )})
                 )
             })
+            val interfaceContext: Map[String, Any] = Map(
+                "manifestModport" -> modportList
+            )
+            val modportTemplate = templateDir / "modport.svh.hbs"
+            val modportDir = genDes / s"modport_${config.project.name}.svh"
+            generator.generateFile(modportDir, modportTemplate, interfaceContext)
         case other =>
 }

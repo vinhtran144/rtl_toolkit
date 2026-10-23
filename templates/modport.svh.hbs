@@ -1,0 +1,21 @@
+# =============================================================================
+#                            AUTO-GENERATED FILE
+# This file was generated automatically from the project manifest.
+# =============================================================================
+{{#each manifestModport~}}
+    modport {{mod_name}}(
+    {{#each signals~}}
+        {{direction}} {{net}}
+        {{~#if @last}}
+            {{~#if ../tasks}},{{/if}}
+        {{~else}},{{/if}}
+    {{/each}}
+    {{~#each tasks~}}
+        import task {{task_name}}(
+        {{~#each args~}}
+            input {{arg_t}} {{arg_name}}
+        {{~/each}})
+        {{~#unless @last}},{{/unless}}
+    {{/each~}}
+    );
+{{/each}}
