@@ -5,7 +5,7 @@ import io.circe.generic.auto.*
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.Json
-import cats.data.Op
+import io.circe.Decoder
 
 case class ProjectConfig(project: ProjectDetail)
 case class ProjectDetail(name: String, `type`: String, ver: String)
@@ -27,9 +27,20 @@ case class InterfaceNet(net_name: String, interface: String, array_size: Option[
 case class NetsList(logic: Option[List[LogicNet]] = None, 
     interface: Option[List[InterfaceNet]] = None)
 
+// Explicitly defined TaskDef since circle seems to have problem with too deep nested case class
+case class TaskDef(task_name: String, args: Option[List[ArgsDef]] = None)
+object TaskDef {
+  given Decoder[TaskDef] = Decoder.instance { cursor =>
+    for {
+      task_name <- cursor.downField("task_name").as[String]
+      args      <- cursor.downField("args").as[Option[List[ArgsDef]]]
+    } yield TaskDef(task_name, args)
+  }
+}
 case class SignalDef(direction: String, net: String)
-case class ModportDef(mod_name: String, signals: Option[List[SignalDef]] = None,
-    tasks: Option[List[String]] = None)
+case class ArgsDef(arg_name: String, arg_t: String)
+case class ModportDef(mod_name: String, signals: Option[List[SignalDef]] = None, 
+    tasks: Option[List[TaskDef]] = None)
 
 case class InterfaceModport(modport: Option[List[ModportDef]])
 
@@ -193,8 +204,16 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
                                         "net"       -> signalDef.net
                                     )}),
                     "tasks"     -> modportDef.tasks.getOrElse(List.empty).map({task =>
-                                    Map( "name"-> task )
-                                })
+                                    Map( 
+                                        "task_name" -> task.task_name,
+                                        "args"      -> task.args.getOrElse(List.empty)
+                                            .map({
+                                                arg => Map(
+                                                    "arg_name"  -> arg.arg_name,
+                                                    "arg_t"     -> arg.arg_t
+                                                )
+                                            })
+                                )})
                 )
             })
         case other =>
