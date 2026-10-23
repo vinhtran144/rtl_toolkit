@@ -2,21 +2,23 @@
 {{#if hasPkg}}import {{project_name}}_pkg::*;
 {{/if}}
 {{#eq project_type "Interface"}}
-interface {{project_name}} #(`include "{{module_param}}")(`include "{{module_sign}}");
+interface {{project_name}} #(`include "io_param_{{project_name}}.svh")(`include "io_sig_{{project_name}}.svh");
+    `include "nets_{{project_name}}.svh"
+    `include "modport_{{project_name}}.svh"
     {{#each logic_header}}`include "{{this}}"
     {{/each}}
-
     {{#each task_header}}`include "{{this}}"
-    {{/each}}
+    {{/each~}}
 
 endinterface : {{project_name}}
 
-{{else}}
-module {{project_name}} #(`include "{{module_param}}")(`include "{{module_sign}}");
+{{else}} {{!-- Assuming Component, as only interface and component have top file --}}
+module {{project_name}} #(`include "io_param_{{project_name}}.svh")(`include "io_sig_{{project_name}}.svh");
+    `include "nets_{{project_name}}.svh"
+    `include "insts_{{project_name}}.svh"
     {{#each logic_header}}`include "{{this}}"
     {{/each}}
-
     {{#each task_header}}`include "{{this}}"
-    {{/each}}
+    {{/each~}}
 endmodule: {{project_name}}
 {{/eq}}

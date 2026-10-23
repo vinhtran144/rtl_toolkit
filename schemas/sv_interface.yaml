@@ -1,7 +1,6 @@
 dirs:
   - "src/rtl"
   - "src/task"
-  - "src/gen"
   - "tb"
   - "sim"
 
@@ -31,12 +30,6 @@ files:
 
   - template: "pkg.sv.hbs"
     output_dir: "src/rtl"
-
-  - template: "io_param.svh.hbs"
-    output_dir: "src/gen"
-  
-  - template: "io_sig.svh.hbs"
-    output_dir: "src/gen"
 
   - template: "logic.svh.hbs"
     output_dir: "src/rtl"

@@ -88,15 +88,6 @@ object generator:
 
         // Extract header files
         val headerFiles = filesNames.filter(_.endsWith(".svh")) 
-
-        // Extract single io_param and io_sig headers 
-        val paramHeader: String = headerFiles
-            .find(_.contains("io_param"))
-            .getOrElse("")
-        val sigHeader: String = headerFiles
-            .find(_.contains("io_sig"))
-            .getOrElse("")
-        
         // Get list of logic headers
         val logicHeaders = headerFiles.filter(_.contains("logic"))
         // Get list of task headers
@@ -105,8 +96,6 @@ object generator:
         // Construct context for extractContext
         Map(
             "hasPkg"       -> hasPkg,
-            "module_param" -> paramHeader,
-            "module_sign"  -> sigHeader,
             "logic_header" -> logicHeaders,
             "task_header"  -> taskHeaders
         )
