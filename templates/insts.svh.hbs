@@ -13,6 +13,20 @@
         {{~#unless @last}},{{/unless}}
     {{~/each}}
     );
-{{!-- {{#else}} --}}
+{{~else}}
+    generate
+        for (genvar i = 0; i < {{array_size}}; i++) begin : gen_{{inst_name}}
+            {{components}} 
+                {{~#each param}} #(.{{name}}({{value}})){{/each}} {{inst_name}} (
+                    {{~#each bindings}}
+                        .{{port_name}}({{#if invert}}~{{/if}}
+                        {{~net}}{{#if per_instance}}[{{#unless (eq offset "0")}}{{offset}}+{{/unless}}i]{{/if}}
+                        {{~index}}{{slice}}{{#if modport}}.{{modport}}
+                        {{~#if signal}}.{{signal}}{{/if}}{{/if}})
+                        {{~#unless @last}},{{/unless}}
+                    {{~/each}}
+                );
+        end
+    endgenerate
 {{/if}}
 {{/each}}

@@ -16,6 +16,7 @@ case class IOLogic(ext_port: String, direction: String)
 case class IOIF(ext_port: String, modport: String)
 case class BindDef(port_name: String, net: String, 
     index: Option[String] = None, slice: Option[String] = None, invert: Option[Boolean] = None, 
+    per_instance: Option[Boolean] = None, offset: Option[Json] = None,
     modport: Option[String] = None, signal: Option[String] = None)
 
 case class LogicNet(net_name: String, bits: Option[Json], bus_wd: Option[Json] = None, 
@@ -225,27 +226,29 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
             val modportTemplate = templateDir / "modport.svh.hbs"
             val modportDir = genDes / s"modport_${config.project.name}.svh"
             generator.generateFile(modportDir, modportTemplate, interfaceContext)
-        // case "Component" =>
+        case "Component" =>
             val instanceList: List [Map[String,Any]] = inst.instances.getOrElse(List.empty).map({
                 instDef =>   
                 Map(
                     "inst_name"     -> instDef.inst_name,
                     "components"    -> instDef.components,
                     "array_size"    -> instDef.array_size.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
-                    "parameters"    -> instDef.parameters.getOrElse(List.empty).map({paramDef => Map(
+                    "param"         -> instDef.parameters.getOrElse(List.empty).map({paramDef => Map(
                                         "name"      -> paramDef.name,
                                         "value"     -> paramDef.value.asString.getOrElse(paramDef.value.noSpaces)
                                     )}),
                     "bindings"       -> instDef.bindings.getOrElse(List.empty)
                                 .map({
                                     bindDef => Map(
-                                        "port_name" -> bindDef.port_name,
-                                        "net"       -> bindDef.net,
-                                        "invert"    -> bindDef.invert.getOrElse(false),
-                                        "index"     -> bindDef.index.getOrElse(""),
-                                        "slice"     -> bindDef.slice.getOrElse(""),
-                                        "modport"   -> bindDef.modport.getOrElse(""),
-                                        "signal"    -> bindDef.signal.getOrElse("")
+                                        "port_name"     -> bindDef.port_name,
+                                        "net"           -> bindDef.net,
+                                        "invert"        -> bindDef.invert.getOrElse(false),
+                                        "index"         -> bindDef.index.getOrElse(""),
+                                        "slice"         -> bindDef.slice.getOrElse(""),
+                                        "per_instance"  -> bindDef.per_instance.getOrElse(false),
+                                        "offset"        -> bindDef.offset.fold("0")({value => value.asString.getOrElse(value.noSpaces)}),
+                                        "modport"       -> bindDef.modport.getOrElse(""),
+                                        "signal"        -> bindDef.signal.getOrElse("")
                                     )
                                 }) 
                 )
