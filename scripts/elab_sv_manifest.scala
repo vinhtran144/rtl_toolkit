@@ -83,17 +83,7 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
 
     val (config,param,inst,nets,modports) = validator.unwrapOrExit(projectData)
 
-    val paramList : List[Map[String, String]] = param.parameters // Unpack Option
-        .getOrElse(List.empty)      // For None case, i.e parameters left plank
-        .map({paramDef =>     // Iterates through each ParamDef object
-
-            // Assemble context
-            Map(
-            "name"      -> paramDef.name,
-            "value"     -> paramDef.value.asString.getOrElse(paramDef.value.noSpaces),
-            "data_t"    -> paramDef.data_t.getOrElse("")
-            )
-        })
+    val paramList : List[Map[String, String]] = param.parameters.getOrElse(List.empty).map(buildParamMap)
         
     val logicNets : List[Map[String, Any]] = nets.logic.getOrElse(List.empty).map({
         logicNet =>
@@ -109,67 +99,15 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
 
     val interfaceNets: List[Map[String, Any]] = nets.interface.getOrElse(List.empty).map({
         interfaceNet =>
-            // Map parameters into list of map
-            val ifParamList : List[Map[String, String]] = interfaceNet.parameters.getOrElse(List.empty)
-                .map({
-                    paramDef => Map(
-                        "name"      -> paramDef.name,
-                        "value"     -> paramDef.value.asString.getOrElse(paramDef.value.noSpaces)
-                    )
-                })
-            val ifBindingList: List[Map[String, Any]] = interfaceNet.bindings.getOrElse(List.empty)
-                .map({
-                    bindDef => Map(
-                        "port_name" -> bindDef.port_name,
-                        "net"       -> bindDef.net,
-                        "invert"    -> bindDef.invert.getOrElse(false),
-                        "index"     -> bindDef.index.getOrElse(""),
-                        "slice"     -> bindDef.slice.getOrElse(""),
-                        "modport"   -> bindDef.modport.getOrElse(""),
-                        "signal"    -> bindDef.signal.getOrElse("")
-                    )
-                }) 
             Map(
                 "net_name"  -> interfaceNet.net_name,
                 "interface" -> interfaceNet.interface,
                 "array_size"-> interfaceNet.array_size.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
-                "param"     -> ifParamList,  //List
-                "bindings"  -> ifBindingList,
+                "param"     -> interfaceNet.parameters.getOrElse(List.empty).map(buildParamMap),
+                "bindings"  -> interfaceNet.bindings.getOrElse(List.empty).map(buildBindingMap),
                 "is_io"     -> interfaceNet.io.isDefined,
                 "io_name"   -> interfaceNet.io.fold("")(_.ext_port),
                 "io_modport"-> interfaceNet.io.fold("")(_.modport)
-            )
-        
-    })
-
-    val instanceList: List[Map[String, Any]] = inst.instances.getOrElse(List.empty).map({
-        instDef =>
-            // Map parameters into list of map
-            val instParamList : List[Map[String, String]] = instDef.parameters.getOrElse(List.empty)
-                .map({
-                    paramDef => Map(
-                        "name"      -> paramDef.name,
-                        "value"     -> paramDef.value.asString.getOrElse(paramDef.value.noSpaces)
-                    )
-                })
-            val instBindingList: List[Map[String, Any]] = instDef.bindings.getOrElse(List.empty)
-                .map({
-                    bindDef => Map(
-                        "port_name" -> bindDef.port_name,
-                        "net"       -> bindDef.net,
-                        "invert"    -> bindDef.invert.getOrElse(false),
-                        "index"     -> bindDef.index.getOrElse(""),
-                        "slice"     -> bindDef.slice.getOrElse(""),
-                        "modport"   -> bindDef.modport.getOrElse(""),
-                        "signal"    -> bindDef.signal.getOrElse("")
-                    )
-                }) 
-            Map(
-                "inst_name" -> instDef.inst_name,
-                "components"-> instDef.components,
-                "array_size"-> instDef.array_size.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
-                "param"     -> instParamList,  //List
-                "bindings"  -> instBindingList,
             )
         
     })
@@ -179,8 +117,7 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
         "manifestLogicNet"  -> logicNets,
         "manifestLogicIO"   -> logicNets.filter(net => net("is_io") == true),
         "manifestIFNet"     -> interfaceNets,
-        "manifestIFIO"      -> interfaceNets.filter(net => net("is_io") == true),
-        "manifestInsts"     -> instanceList
+        "manifestIFIO"      -> interfaceNets.filter(net => net("is_io") == true)
     )
 
     val ioParamTemplate = templateDir / "io_param.svh.hbs"
@@ -233,24 +170,8 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
                     "inst_name"     -> instDef.inst_name,
                     "components"    -> instDef.components,
                     "array_size"    -> instDef.array_size.fold("1")({value => value.asString.getOrElse(value.noSpaces)}),
-                    "param"         -> instDef.parameters.getOrElse(List.empty).map({paramDef => Map(
-                                        "name"      -> paramDef.name,
-                                        "value"     -> paramDef.value.asString.getOrElse(paramDef.value.noSpaces)
-                                    )}),
-                    "bindings"       -> instDef.bindings.getOrElse(List.empty)
-                                .map({
-                                    bindDef => Map(
-                                        "port_name"     -> bindDef.port_name,
-                                        "net"           -> bindDef.net,
-                                        "invert"        -> bindDef.invert.getOrElse(false),
-                                        "index"         -> bindDef.index.getOrElse(""),
-                                        "slice"         -> bindDef.slice.getOrElse(""),
-                                        "per_instance"  -> bindDef.per_instance.getOrElse(false),
-                                        "offset"        -> bindDef.offset.fold("0")({value => value.asString.getOrElse(value.noSpaces)}),
-                                        "modport"       -> bindDef.modport.getOrElse(""),
-                                        "signal"        -> bindDef.signal.getOrElse("")
-                                    )
-                                }) 
+                    "param"         -> instDef.parameters.getOrElse(List.empty).map(buildParamMap),
+                    "bindings"      -> instDef.bindings.getOrElse(List.empty).map(buildBindingMap) 
                 )
             })
             val componentContext: Map[String, Any] = Map(
@@ -261,3 +182,21 @@ case class ProjectInsts(instances: Option[List[InstsDef]] = None)
             generator.generateFile(instsDir, instsTemplate, componentContext)
         case other =>
 }
+
+private def buildParamMap(paramDef: ParamDef): Map[String, String] = Map(
+  "name"  -> paramDef.name,
+  "value" -> paramDef.value.asString.getOrElse(paramDef.value.noSpaces),
+  "data_t"    -> paramDef.data_t.getOrElse("")
+)
+
+private def buildBindingMap(bindDef: BindDef): Map[String, Any] = Map(
+  "port_name"    -> bindDef.port_name,
+  "net"          -> bindDef.net,
+  "invert"       -> bindDef.invert.getOrElse(false),
+  "index"        -> bindDef.index.getOrElse(""),
+  "slice"        -> bindDef.slice.getOrElse(""),
+  "per_instance" -> bindDef.per_instance.getOrElse(false),
+  "offset"       -> bindDef.offset.fold("0")(value => value.asString.getOrElse(value.noSpaces)),
+  "modport"      -> bindDef.modport.getOrElse(""),
+  "signal"       -> bindDef.signal.getOrElse("")
+)
