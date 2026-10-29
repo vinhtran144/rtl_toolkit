@@ -2,15 +2,15 @@
 #                            AUTO-GENERATED FILE
 # This file was generated automatically from the project manifest.
 # =============================================================================
-  {{#each manifestLogicIO~}}
+  {{#each logicIO~}}
       {{io_dir}} logic 
       {{~#unless (eq bits "1")}} [{{bits}}-1:0]{{/unless}} {{io_name}}
       {{~#unless (eq bus_wd "1")}} [0:{{bus_wd}}-1]{{/unless}}
       {{~#if @last}}
-        {{~#if ../manifestIFIO}},{{/if}}
+        {{~#if ../interfaceIO}},{{/if}}
       {{~else}},{{/if}}
   {{/each}}
-  {{~#each manifestIFIO~}}
+  {{~#each interfaceIO~}}
       {{interface}}.{{io_modport}} {{io_name}}
       {{~#unless (eq array_size "1")}} [0:{{array_size}}-1]{{/unless}}
       {{~#unless @last}},{{/unless}}

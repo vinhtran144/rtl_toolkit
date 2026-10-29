@@ -2,7 +2,7 @@
 #                            AUTO-GENERATED FILE
 # This file was generated automatically from the project manifest.
 # =============================================================================
-{{#each manifestInsts~}}
+{{#each instances~}}
 {{#if (eq array_size "1")}}
     {{components}}
     {{~#each param}} #(.{{name}}({{value}})){{/each}} {{inst_name}}(

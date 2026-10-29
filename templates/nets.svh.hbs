@@ -2,11 +2,11 @@
 #                            AUTO-GENERATED FILE
 # This file was generated automatically from the project manifest.
 # =============================================================================
-{{#each manifestLogicNet~}}
+{{#each logic~}}
     logic{{#unless (eq bits "1")}} [{{bits}}-1:0]{{/unless}} {{net_name}}
     {{~#unless (eq bus_wd "1")}} [0:{{bus_wd}}-1]{{/unless}};
 {{/each}}
-{{#each manifestIFNet~}}
+{{#each interface~}}
     {{interface}}
     {{~#each param}} #(.{{name}}({{value}})){{/each}} {{net_name}}
     {{~#unless (eq array_size "1")}} [0:{{array_size}}-1]{{/unless}} (
@@ -16,6 +16,6 @@
     {{~#unless @last}},{{/unless}}
     {{~/each}});
 {{/each}}
-{{#each manifestLogicIO~}}
+{{#each logicIO~}}
     assign {{io_name}} = {{net_name}};
 {{/each}}
