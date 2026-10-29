@@ -49,7 +49,7 @@ case class InstsDef(inst_name: String, components: String, array_size: Option[Js
     parameters: Option[List[ParamDef]] = None, bindings: Option[List[BindDef]] = None)
 case class ProjectInsts(instances: Option[List[InstsDef]] = None)
 
-object ManifestHandler:
+object manifestHandler:
     def getContext(yamlPath: os.Path, fields: List[String] = List("project")): Map[String, Any] =
         val projectData = for
             _       <- validator. checkFilesExist(Seq(yamlPath))
