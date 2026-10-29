@@ -121,6 +121,7 @@
       "type" : "pickString",
       "description" : "Select generation script to run:",
       "options" : [
+        "sv_component",
         "sv_interface"
       ]
     },

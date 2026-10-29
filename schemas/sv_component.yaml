@@ -1,0 +1,52 @@
+dirs:
+  - "src/rtl"
+  - "src/task"
+  - "tb"
+  - "sim"
+
+files:
+  - template: "top.sv.hbs"
+    output_dir: ""
+
+  - template: "README.md.hbs"
+    output_dir: ""
+    file_type: "NA"
+
+  - template: ".gitignore.hbs"
+    output_dir: ""
+    file_type: "NA"
+
+  - template: "run.py.hbs"
+    output_dir: "sim"
+    file_type: "NA"
+
+  - template: "dependency.yaml.hbs"
+    output_dir: "src"
+    file_type: "NA"
+
+  - template: "manifest.yaml.hbs"
+    output_dir: "src"
+    file_type: "NA"
+
+  - template: "pkg.sv.hbs"
+    output_dir: "src/rtl"
+
+  - template: "logic.svh.hbs"
+    output_dir: "src/rtl"
+    file_type: "port"
+
+  - template: "task.svh.hbs"
+    output_dir: "src/task"
+    file_type: "driver"
+
+  - template: "task.svh.hbs"
+    output_dir: "src/task"
+    file_type: "monitor"
+
+  - template: "tb_task.sv.hbs"
+    output_dir: "tb"
+    file_type: "driver"
+
+  - template: "tb_task.sv.hbs"
+    output_dir: "tb"
+    file_type: "monitor"
