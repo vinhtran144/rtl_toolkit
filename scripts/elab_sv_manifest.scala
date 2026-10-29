@@ -27,9 +27,9 @@ import toolkitUtils.*
 
     // Generate files for interface and component
     projectType match {
-        case "Interface" =>
+        case "interface" =>
             generator.generateFile(genDes / s"modport_${projectName}.svh", templateDir / "modport.svh.hbs", manifestContext)
-        case "Component" =>
+        case "component" =>
             generator.generateFile(genDes / s"insts_${projectName}.svh", templateDir / "insts.svh.hbs", manifestContext)
         case other =>
 }

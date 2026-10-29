@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 {{#if hasPkg}}import {{project_name}}_pkg::*;
 {{/if}}
-{{~#eq project_type "Interface"}}
+{{~#eq project_type "interface"}}
 interface {{project_name}} #(`include "io_param_{{project_name}}.svh")(`include "io_sig_{{project_name}}.svh");
     `include "nets_{{project_name}}.svh"
     `include "modport_{{project_name}}.svh"

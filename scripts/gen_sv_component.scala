@@ -13,7 +13,7 @@ import toolkitUtils.*
 
     // Inject project type into context so hbs can use
     val genContextFull = generateContext ++ Map (
-        "project_type" -> "Component"
+        "project_type" -> "component"
     )
     
     // Check if the new project already exist
